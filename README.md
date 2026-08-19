@@ -37,16 +37,17 @@ Open http://localhost:3000.
 
 | Field | Value |
 |-------|-------|
-| Company website or App link | `https://pinterest-integration-xxx.vercel.app` |
-| Privacy policy link | `https://pinterest-integration-xxx.vercel.app/privacy` |
+| App purpose | Visual reference moodboard for creative projects: search Pinterest pins, curate a private reference board, and display saved images with proper attribution. |
+| Company website or App link | `https://pinterest-integration.vercel.app` |
+| Privacy policy link | `https://pinterest-integration.vercel.app/privacy` |
 | Redirect URI (dev) | `http://localhost:3000/api/pinterest/auth/callback` |
-| Redirect URI (prod) | `https://pinterest-integration-xxx.vercel.app/api/pinterest/auth/callback` |
+| Redirect URI (prod) | `https://pinterest-integration.vercel.app/api/pinterest/auth/callback` |
 
 3. Copy **App ID** and **App Secret** into `.env.local`.
 4. Set `SITE_URL=http://localhost:3000` in `.env.local` for local development.
 5. Start the dev server and click **Connect Pinterest**.
-5. After OAuth callback, copy tokens from the console into `.env.local`.
-6. Restart the dev server.
+6. After OAuth callback, copy tokens from the console into `.env.local`.
+7. Restart the dev server.
 
 ## Deployment
 
@@ -69,10 +70,10 @@ Or import the GitHub repository in the Vercel Dashboard.
 Add these environment variables in Vercel project settings:
 
 ```bash
-SITE_URL=https://pinterest-integration-xxx.vercel.app
+SITE_URL=https://pinterest-integration.vercel.app
 PINTEREST_APP_ID=...
 PINTEREST_APP_SECRET=...
-PINTEREST_REDIRECT_URI=https://pinterest-integration-xxx.vercel.app/api/pinterest/auth/callback
+PINTEREST_REDIRECT_URI=https://pinterest-integration.vercel.app/api/pinterest/auth/callback
 PINTEREST_ACCESS_TOKEN=...
 PINTEREST_REFRESH_TOKEN=...
 PINTEREST_TOKEN_EXPIRES_AT=...
