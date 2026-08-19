@@ -38,10 +38,10 @@ Open http://localhost:3000.
 | Field | Value |
 |-------|-------|
 | App purpose | Visual reference moodboard for creative projects: search Pinterest pins, curate a private reference board, and display saved images with proper attribution. |
-| Company website or App link | `https://pinterest-integration.vercel.app` |
-| Privacy policy link | `https://pinterest-integration.vercel.app/privacy` |
+| Company website or App link | `https://visref-moodboard.vercel.app` |
+| Privacy policy link | `https://visref-moodboard.vercel.app/privacy` |
 | Redirect URI (dev) | `http://localhost:3000/api/pinterest/auth/callback` |
-| Redirect URI (prod) | `https://pinterest-integration.vercel.app/api/pinterest/auth/callback` |
+| Redirect URI (prod) | `https://visref-moodboard.vercel.app/api/pinterest/auth/callback` |
 
 3. Copy **App ID** and **App Secret** into `.env.local`.
 4. Set `SITE_URL=http://localhost:3000` in `.env.local` for local development.
@@ -70,10 +70,10 @@ Or import the GitHub repository in the Vercel Dashboard.
 Add these environment variables in Vercel project settings:
 
 ```bash
-SITE_URL=https://pinterest-integration.vercel.app
+SITE_URL=https://visref-moodboard.vercel.app
 PINTEREST_APP_ID=...
 PINTEREST_APP_SECRET=...
-PINTEREST_REDIRECT_URI=https://pinterest-integration.vercel.app/api/pinterest/auth/callback
+PINTEREST_REDIRECT_URI=https://visref-moodboard.vercel.app/api/pinterest/auth/callback
 PINTEREST_ACCESS_TOKEN=...
 PINTEREST_REFRESH_TOKEN=...
 PINTEREST_TOKEN_EXPIRES_AT=...
