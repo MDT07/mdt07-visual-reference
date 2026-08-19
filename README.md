@@ -38,8 +38,8 @@ Open http://localhost:3000.
 | Field | Value |
 |-------|-------|
 | App purpose | Visual reference moodboard for creative projects: search Pinterest pins, curate a private reference board, and display saved images with proper attribution. |
-| Company website or App link | `https://mdt07.github.io/visref-moodboard/` |
-| Privacy policy link | `https://mdt07.github.io/visref-moodboard/privacy` |
+| Company website or App link | `https://mdt07.github.io/privacy-policy/` |
+| Privacy policy link | `https://mdt07.github.io/privacy-policy/privacy/` |
 | Redirect URI (dev) | `http://localhost:3000/api/pinterest/auth/callback` |
 | Redirect URI (prod) | `https://visref-moodboard.vercel.app/api/pinterest/auth/callback` |
 
