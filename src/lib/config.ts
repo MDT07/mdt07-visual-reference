@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "Pinterest Integration",
-  domain: "localhost",
-  url: "http://localhost:3000",
+  domain: process.env.SITE_DOMAIN ?? "localhost",
+  url: process.env.SITE_URL ?? "http://localhost:3000",
 } as const;
 
 export type SiteConfig = typeof siteConfig;
