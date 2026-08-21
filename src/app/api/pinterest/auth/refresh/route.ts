@@ -13,7 +13,11 @@ export async function POST(): Promise<NextResponse> {
 
   try {
     const refreshed = await refreshAccessToken(tokens.refreshToken);
-    updateAccessToken(refreshed.access_token, refreshed.expires_in);
+    updateAccessToken(
+      refreshed.access_token,
+      refreshed.expires_in,
+      refreshed.refresh_token
+    );
     return NextResponse.json({
       success: true,
       expires_in: refreshed.expires_in,

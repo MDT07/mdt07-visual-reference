@@ -1,6 +1,7 @@
 {
-  "name": "pinterest-integration",
+  "name": "mdt07-pinterest-reference",
   "version": "0.1.0",
+  "description": "A web tool for discovering and exploring Pinterest visual references for web design and development projects.",
   "private": true,
   "scripts": {
     "dev": "next dev",

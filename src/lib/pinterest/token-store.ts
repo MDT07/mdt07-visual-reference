@@ -32,25 +32,18 @@ export function saveTokens(tokens: PinterestTokenResponse): StoredTokens {
     refreshToken: tokens.refresh_token,
     expiresAt,
   };
-  // В dev выводим в консоль, чтобы пользователь мог скопировать в .env.local.
-  // В prod здесь должна быть запись в KV/DB.
-  if (process.env.NODE_ENV === "development") {
-    console.log("\n=== Pinterest tokens ===");
-    console.log(`PINTEREST_ACCESS_TOKEN=${tokens.access_token}`);
-    if (tokens.refresh_token) {
-      console.log(`PINTEREST_REFRESH_TOKEN=${tokens.refresh_token}`);
-    }
-    console.log(`PINTEREST_TOKEN_EXPIRES_AT=${expiresAt}`);
-    console.log("========================\n");
-  }
   return memoryStore;
 }
 
-export function updateAccessToken(accessToken: string, expiresIn: number): void {
+export function updateAccessToken(
+  accessToken: string,
+  expiresIn: number,
+  refreshToken?: string
+): void {
   const current = getTokens();
   memoryStore = {
     accessToken,
-    refreshToken: current?.refreshToken,
+    refreshToken: refreshToken ?? current?.refreshToken,
     expiresAt: Date.now() + expiresIn * 1000,
   };
 }

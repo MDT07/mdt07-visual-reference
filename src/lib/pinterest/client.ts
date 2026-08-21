@@ -31,7 +31,11 @@ async function ensureAccessToken(): Promise<string> {
 
   if (isExpiringSoon && tokens.refreshToken) {
     const refreshed = await refreshAccessToken(tokens.refreshToken);
-    updateAccessToken(refreshed.access_token, refreshed.expires_in);
+    updateAccessToken(
+      refreshed.access_token,
+      refreshed.expires_in,
+      refreshed.refresh_token
+    );
     return refreshed.access_token;
   }
 

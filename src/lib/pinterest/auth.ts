@@ -1,4 +1,4 @@
-import { pinterestConfig } from "@/lib/config";
+import { assertPinterestConfigured, pinterestConfig } from "@/lib/config";
 import type { PinterestTokenResponse } from "./types";
 
 export function generateState(): string {
@@ -8,6 +8,7 @@ export function generateState(): string {
 }
 
 export function buildAuthorizationUrl(state: string): string {
+  assertPinterestConfigured();
   const params = new URLSearchParams({
     client_id: pinterestConfig.appId,
     redirect_uri: pinterestConfig.redirectUri,
@@ -19,6 +20,7 @@ export function buildAuthorizationUrl(state: string): string {
 }
 
 function basicAuthHeader(): string {
+  assertPinterestConfigured();
   const credentials = Buffer.from(
     `${pinterestConfig.appId}:${pinterestConfig.appSecret}`
   ).toString("base64");
@@ -30,7 +32,6 @@ export async function exchangeCode(code: string): Promise<PinterestTokenResponse
     grant_type: "authorization_code",
     code,
     redirect_uri: pinterestConfig.redirectUri,
-    continuous_refresh: "true",
   });
 
   const res = await fetch(`${pinterestConfig.apiBase}/oauth/token`, {
@@ -61,7 +62,6 @@ export async function refreshAccessToken(
   const body = new URLSearchParams({
     grant_type: "refresh_token",
     refresh_token: refreshToken,
-    continuous_refresh: "true",
   });
 
   const res = await fetch(`${pinterestConfig.apiBase}/oauth/token`, {
