@@ -3,7 +3,7 @@ import PageIntro from "@/components/site/PageIntro";
 import { getPublicUrl, siteConfig } from "@/lib/config";
 
 const description =
-  "Privacy Policy for MDT07 Pinterest Reference, including Pinterest OAuth, data use, storage, cookies, and deletion requests.";
+  "Privacy Policy for MDT07 Visual Reference, including Pinterest OAuth, encrypted sessions, transient API data, and deletion choices.";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
       <PageIntro
         eyebrow="Legal"
         title="Privacy Policy"
-        description="This policy explains how MDT07 Pinterest Reference handles information when you visit the public website or connect Pinterest through OAuth."
+        description="This policy explains how MDT07 Visual Reference handles information when you visit the public website or connect Pinterest through OAuth."
       />
 
       <div className="legal-content py-12">
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
         <section>
           <h2>1. Scope of this policy</h2>
           <p>
-            This Privacy Policy applies to MDT07 Pinterest Reference (the
+            This Privacy Policy applies to MDT07 Visual Reference (the
             “Application”), an independent web tool for discovering, exploring, and
             curating Pinterest visual references for web design and development
             projects. The Application is not an official Pinterest product and is not
@@ -56,12 +56,12 @@ export default function PrivacyPage() {
           </p>
           <h3>Pinterest content</h3>
           <p>
-            With the permissions you approve, the Application may retrieve Pins and
-            boards that Pinterest makes available through its API. That data may include
-            Pin and board identifiers, titles, descriptions, images, source links,
-            media details, and a board owner username included with a Pin. The current
-            implementation requests read-only access for Pins and boards and does not
-            request a separate Pinterest profile scope.
+            With the permission you approve, the Application may retrieve public Pins
+            that Pinterest makes available through its API. That data may include Pin
+            identifiers, titles, descriptions, images, source links, media details, and
+            a board owner username included with a Pin. The current implementation
+            requests only the read-only <code>pins:read</code> scope and does not request
+            profile, board, secret-content, or write scopes.
           </p>
           <h3>Session moodboard</h3>
           <p>
@@ -91,7 +91,7 @@ export default function PrivacyPage() {
           <p>
             You can decline authorization or later revoke the Application’s access in
             your Pinterest account settings. Revocation may prevent Pinterest search,
-            board access, or other connected features from working.
+            search or other connected features from working.
           </p>
         </section>
 
@@ -100,10 +100,10 @@ export default function PrivacyPage() {
           <ul>
             <li>To authenticate authorized requests to the Pinterest API.</li>
             <li>To search and display relevant Pins for visual research.</li>
-            <li>To retrieve boards when that feature is used.</li>
             <li>To curate selected references into the Application’s moodboard.</li>
             <li>To link users back to original Pinterest sources.</li>
-            <li>To operate, secure, diagnose, and improve the Application.</li>
+            <li>To enforce short-lived request limits and protect API access from abuse.</li>
+            <li>To operate, secure, and diagnose the Application.</li>
             <li>To respond to privacy or support messages sent by email.</li>
           </ul>
           <p>
@@ -115,27 +115,36 @@ export default function PrivacyPage() {
         <section>
           <h2>5. Storage and retention</h2>
           <p>
-            Access credentials are handled on the server. Depending on deployment
-            configuration, tokens are loaded from protected server environment variables
-            or retained temporarily in server memory after an OAuth callback. They are
-            not stored in local storage in the browser. Production credentials must not
-            be committed to the public source repository.
+            The Pinterest App Secret is held only in protected server environment
+            configuration. After OAuth, the access token and any refresh token are
+            encrypted into an HTTP-only, Secure production session cookie that browser
+            JavaScript cannot read. The Application does not keep one shared user token,
+            write user tokens to its source repository, or persist them in an application
+            database. The session cookie expires no later than the configured refresh
+            lifetime and is replaced when Pinterest refreshes authorization.
           </p>
           <p>
-            Pinterest content returned for search, board access, or the session
-            moodboard is not intentionally persisted by the Application. OAuth state
-            cookies expire after approximately ten minutes. Routine hosting security
-            and request logs follow the hosting provider’s retention settings.
+            Pinterest search responses are returned with instructions not to cache and
+            are kept only in the memory of the open page. Pinterest images are loaded
+            from their original remote source without the Application’s image optimization
+            cache. OAuth state cookies expire after approximately ten minutes. A one-way
+            identifier derived from request and session information may remain briefly
+            in an individual server instance to enforce one-minute request windows,
+            until routine cleanup or instance recycling.
+            Routine hosting security and request logs follow the hosting provider’s
+            retention settings.
           </p>
         </section>
 
         <section>
           <h2>6. Cookies and browser storage</h2>
           <p>
-            The current Application uses one essential, short-lived, HTTP-only cookie
-            during Pinterest OAuth to verify the state parameter. It does not currently
-            use local storage or session storage, and it does not use advertising or
-            analytics cookies. If those practices change, this policy will be updated.
+            The Application uses an essential, short-lived, HTTP-only cookie during
+            Pinterest OAuth to verify the state parameter. If authorization succeeds, it
+            uses a separate encrypted HTTP-only cookie to isolate that browser’s Pinterest
+            tokens and connection state. It does not currently use local storage,
+            session storage, advertising cookies, or analytics cookies. If those
+            practices change, this policy will be updated.
           </p>
         </section>
 
@@ -143,8 +152,9 @@ export default function PrivacyPage() {
           <h2>7. Security</h2>
           <p>
             Reasonable technical measures are used to protect data, including keeping
-            Pinterest App Secrets and tokens in server-side configuration, using an
-            HTTP-only OAuth state cookie, and serving production traffic over HTTPS.
+            the Pinterest App Secret in server-side configuration, encrypting tokens in
+            an HTTP-only session cookie, checking OAuth state, limiting connected API
+            requests, and serving production traffic over HTTPS.
             No internet service or storage method can be guaranteed to be completely
             secure.
           </p>
@@ -161,7 +171,7 @@ export default function PrivacyPage() {
             provider will process that message under their own policies.
           </p>
           <p>
-            Links to Pins, boards, or other external sites take you to services not
+            Links to Pins or other external sites take you to services not
             controlled by this Application.
           </p>
         </section>
@@ -175,12 +185,14 @@ export default function PrivacyPage() {
             authorization through Pinterest.
           </p>
           <p>
-            To request deletion of a token or other information held by the Application, email
-            <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>
-            with enough context to identify the connected data. The request may need to
-            be verified before relevant tokens or related records are deleted. Data
-            may remain briefly in security logs or backups until their normal retention
-            cycles complete.
+            Use the Disconnect control on the home page to delete the encrypted token
+            cookie from this browser. You can also revoke the Application in Pinterest
+            account settings. Because the Application does not maintain a user-token
+            database, it generally has no separate token record to locate after the
+            cookie is removed. For questions or a request concerning other information,
+            email <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>.
+            Routine security logs may remain until the hosting provider’s normal
+            retention cycle completes.
           </p>
         </section>
 

@@ -28,13 +28,15 @@ export default function MoodboardGrid({ pins, labels }: MoodboardGridProps) {
             rel="noopener noreferrer"
             className="block"
           >
-            <div className="relative aspect-[4/5] overflow-hidden bg-surface-2">
+            <div className="flex min-h-40 items-center justify-center bg-surface-2">
               <Image
                 src={pin.imageUrl}
                 alt={pin.altText || pin.title || "Reference"}
-                fill
+                width={pin.imageWidth ?? 600}
+                height={pin.imageHeight ?? 750}
                 sizes="(max-width: 768px) 50vw, 25vw"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                unoptimized
+                className="h-auto w-full object-contain"
               />
             </div>
           </a>

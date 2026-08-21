@@ -68,8 +68,6 @@ export interface PinterestErrorResponse {
   detail?: string;
 }
 
-export type PinterestUsage = "direct" | "reference";
-
 export interface CuratedPin {
   id: string;
   pinterestId: string;
@@ -84,7 +82,6 @@ export interface CuratedPin {
   dominantColor?: string;
   authorUsername?: string;
   mediaType: "image" | "video";
-  usage: PinterestUsage;
   query: string;
   savedAt: string;
 }

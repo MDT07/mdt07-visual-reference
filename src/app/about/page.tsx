@@ -3,14 +3,14 @@ import PageIntro from "@/components/site/PageIntro";
 import { getPublicUrl } from "@/lib/config";
 
 const description =
-  "Learn how MDT07 Pinterest Reference supports visual research for website and interface design projects.";
+  "Learn how MDT07 Visual Reference turns a web-project brief into a focused, source-linked visual research session.";
 
 export const metadata: Metadata = {
   title: "About",
   description,
   alternates: { canonical: getPublicUrl("/about") },
   openGraph: {
-    title: "About MDT07 Pinterest Reference",
+    title: "About MDT07 Visual Reference",
     description,
     url: getPublicUrl("/about"),
   },
@@ -45,7 +45,7 @@ export default function AboutPage() {
       <PageIntro
         eyebrow="About the project"
         title="A clearer path from research to web design"
-        description="MDT07 Pinterest Reference is designed for finding and studying Pinterest visual references that can inform the design of websites and interfaces."
+        description="MDT07 Visual Reference is designed for finding and studying source-linked visual references that can inform an original website or interface."
       />
 
       <section className="grid gap-8 py-12 md:grid-cols-2">
@@ -55,8 +55,8 @@ export default function AboutPage() {
           </h2>
           <p className="leading-7 text-text-secondary">
             Visual research often gets scattered across tabs, links, and disconnected
-            screenshots. This tool creates a focused workflow for discovering useful
-            directions and curating them into a reference moodboard for web projects.
+            screenshots. This tool starts with one web-project brief and creates a
+            focused, temporary workspace for comparing useful directions.
           </p>
         </div>
         <div className="space-y-4">
@@ -93,7 +93,7 @@ export default function AboutPage() {
           References are inspiration, not ownership
         </h2>
         <p className="leading-7 text-text-secondary">
-          MDT07 Pinterest Reference does not claim ownership of third-party content,
+          MDT07 Visual Reference does not claim ownership of third-party content,
           automatically copy complete designs, or grant rights to reuse content. Pins
           remain linked to Pinterest as their source, and users are responsible for
           respecting the rights attached to any material they study.

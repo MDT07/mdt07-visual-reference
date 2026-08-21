@@ -1,14 +1,14 @@
 const siteUrl = (
   process.env.SITE_URL ??
   (process.env.NODE_ENV === "production"
-    ? "https://pinterest-integration.vercel.app"
+    ? "https://mdt07-visual-reference.vercel.app"
     : "http://localhost:3000")
 ).replace(/\/$/, "");
 
 export const siteConfig = {
-  name: "MDT07 Pinterest Reference",
+  name: "MDT07 Visual Reference",
   description:
-    "A web tool for discovering and exploring Pinterest visual references for web design and development projects.",
+    "A project-scoped visual research workspace for web design and development, using transient Pinterest references with links to their original sources.",
   contactEmail: "emirsemenov@yahoo.com",
   githubUrl: "https://github.com/MDT07",
   githubUsername: "MDT07",
@@ -27,22 +27,24 @@ export const pinterestConfig = {
   appId: process.env.PINTEREST_APP_ID ?? "",
   appSecret: process.env.PINTEREST_APP_SECRET ?? "",
   redirectUri: process.env.PINTEREST_REDIRECT_URI ?? "",
+  sessionSecret: process.env.PINTEREST_SESSION_SECRET ?? "",
   apiBase: process.env.PINTEREST_API_BASE ?? "https://api.pinterest.com/v5",
   searchPageSize: Number(process.env.PINTEREST_SEARCH_PAGE_SIZE ?? 25),
-  scopes: ["pins:read", "boards:read"] as const,
+  scopes: ["pins:read"] as const,
 } as const;
 
 export const isPinterestConfigured = (): boolean =>
   Boolean(
-    pinterestConfig.appId &&
+      pinterestConfig.appId &&
       pinterestConfig.appSecret &&
-      pinterestConfig.redirectUri
+      pinterestConfig.redirectUri &&
+      pinterestConfig.sessionSecret
   );
 
 export function assertPinterestConfigured(): void {
   if (!isPinterestConfigured()) {
     throw new Error(
-      "Pinterest OAuth is not configured. Set PINTEREST_APP_ID, PINTEREST_APP_SECRET, and PINTEREST_REDIRECT_URI."
+      "Pinterest OAuth is not configured. Set PINTEREST_APP_ID, PINTEREST_APP_SECRET, PINTEREST_REDIRECT_URI, and PINTEREST_SESSION_SECRET."
     );
   }
 }

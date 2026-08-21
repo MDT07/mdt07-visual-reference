@@ -3,7 +3,7 @@ import PageIntro from "@/components/site/PageIntro";
 import { getPublicUrl, siteConfig } from "@/lib/config";
 
 const description =
-  "Terms of Service for using MDT07 Pinterest Reference and its Pinterest-connected visual research features.";
+  "Terms of Service for using MDT07 Visual Reference and its Pinterest-connected visual research features.";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -22,7 +22,7 @@ export default function TermsPage() {
       <PageIntro
         eyebrow="Legal"
         title="Terms of Service"
-        description="These terms describe the permitted use of MDT07 Pinterest Reference and its Pinterest-connected features."
+        description="These terms describe the permitted use of MDT07 Visual Reference and its Pinterest-connected features."
       />
 
       <div className="legal-content py-12">
@@ -31,11 +31,11 @@ export default function TermsPage() {
         <section>
           <h2>1. Purpose of the Application</h2>
           <p>
-            MDT07 Pinterest Reference (the “Application”) is an independent web tool
-            for discovering, exploring, and curating Pinterest visual references for
-            web design and development projects. It is intended to support research and
-            the creation of original work. The Application is not an official Pinterest
-            product and is not endorsed by or affiliated with Pinterest.
+            MDT07 Visual Reference (the “Application”) is an independent,
+            project-scoped visual research workspace for web design and development.
+            It may use transient, source-linked Pinterest references to support research
+            and the creation of original work. It is not a replacement Pinterest client,
+            an official Pinterest product, or endorsed by or affiliated with Pinterest.
           </p>
         </section>
 

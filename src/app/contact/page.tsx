@@ -3,7 +3,7 @@ import PageIntro from "@/components/site/PageIntro";
 import { getPublicUrl, siteConfig } from "@/lib/config";
 
 const description =
-  "Contact MDT07 Pinterest Reference for support, privacy questions, and Pinterest data deletion requests.";
+  "Contact MDT07 Visual Reference for support, privacy questions, and Pinterest connection requests.";
 
 export const metadata: Metadata = {
   title: "Contact",

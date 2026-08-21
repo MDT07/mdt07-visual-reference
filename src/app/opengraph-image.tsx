@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const alt =
-  "MDT07 Pinterest Reference — visual research for web design and development";
+  "MDT07 Visual Reference — project-scoped research for web design and development";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -44,7 +44,7 @@ export default function OpenGraphImage() {
           >
             M7
           </div>
-          MDT07 Pinterest Reference
+          MDT07 Visual Reference
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           <div
@@ -69,7 +69,7 @@ export default function OpenGraphImage() {
               maxWidth: 980,
             }}
           >
-            Discover Pinterest references for web design and development projects.
+            Focus visual research around one web design or development project.
           </div>
         </div>
       </div>

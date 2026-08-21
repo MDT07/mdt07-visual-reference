@@ -1,11 +1,11 @@
-# MDT07 Pinterest Reference
+# MDT07 Visual Reference
 
-A web tool for discovering and exploring Pinterest visual references for web design
-and development projects. The application searches Pinterest data through server-side
-API routes, links users back to original Pins, and lets selected references be curated
-into a non-persistent moodboard for the current open page.
+A project-scoped visual research workspace for web design and development. The
+application turns a specific project brief into a temporary comparison workspace,
+retrieves source-linked Pinterest references through server-side API routes, and keeps
+selected references only in the current open page.
 
-MDT07 Pinterest Reference is an independent project. It is not endorsed by, affiliated
+MDT07 Visual Reference is an independent project. It is not endorsed by, affiliated
 with, or an official product of Pinterest.
 
 ## Repository and production site
@@ -14,10 +14,10 @@ with, or an official product of Pinterest.
 - Current repository: `visref-moodboard`
 - Repository URL: `https://github.com/MDT07/visref-moodboard`
 - GitHub profile: `https://github.com/MDT07`
-- Production website: `https://pinterest-integration.vercel.app/`
-- Privacy Policy: `https://pinterest-integration.vercel.app/privacy`
+- Production website: `https://mdt07-visual-reference.vercel.app/`
+- Privacy Policy: `https://mdt07-visual-reference.vercel.app/privacy`
 - Production OAuth callback:
-  `https://pinterest-integration.vercel.app/api/pinterest/auth/callback`
+  `https://mdt07-visual-reference.vercel.app/api/pinterest/auth/callback`
 
 Vercel hosts both the public review website and the server-side Next.js application so
 the product pages, Privacy Policy, and OAuth callback use one stable production host.
@@ -25,9 +25,10 @@ the product pages, Privacy Policy, and OAuth callback use one stable production 
 ## Features
 
 - Public Home, About, Privacy Policy, Terms of Service, and Contact pages
-- Pinterest OAuth 2.0 endpoints with a short-lived state cookie
-- Read-only Pin search and board access through Pinterest API v5
-- Server-side App Secret and token handling
+- Pinterest OAuth 2.0 with a short-lived state cookie
+- Read-only Pin search through Pinterest API v5 using only `pins:read`
+- Per-browser encrypted HTTP-only token sessions; no shared user token
+- Authenticated API routes with short-lived rate limiting
 - Session-only reference moodboard with original Pinterest source links
 - Per-page metadata, Open Graph image, favicon, robots, and sitemap
 
@@ -60,8 +61,8 @@ the product pages, Privacy Policy, and OAuth callback use one stable production 
 | `/api/pinterest/auth` | Start Pinterest OAuth |
 | `/api/pinterest/auth/callback` | Validate OAuth state and exchange the code |
 | `/api/pinterest/auth/refresh` | Refresh an access token |
+| `/api/pinterest/auth/disconnect` | Delete the current browser's encrypted token session |
 | `/api/pinterest/search?q=...` | Search Pins |
-| `/api/pinterest/boards` | List boards available to the authorized account |
 
 ## Local development
 
@@ -86,33 +87,29 @@ SITE_DOMAIN=localhost
 PINTEREST_APP_ID=
 PINTEREST_APP_SECRET=
 PINTEREST_REDIRECT_URI=http://localhost:3000/api/pinterest/auth/callback
-
-PINTEREST_ACCESS_TOKEN=
-PINTEREST_REFRESH_TOKEN=
-PINTEREST_TOKEN_EXPIRES_AT=
+PINTEREST_SESSION_SECRET=
 
 PINTEREST_API_BASE=https://api.pinterest.com/v5
 PINTEREST_SEARCH_PAGE_SIZE=25
 ```
 
-The current OAuth callback keeps newly exchanged tokens only in server memory.
-Environment tokens remain supported for the current single-account workflow. Do not
-persist Pinterest API content without confirming compliance with the current Pinterest
-Developer Guidelines.
+`PINTEREST_SESSION_SECRET` must contain at least 32 random characters. OAuth tokens are
+encrypted into a Secure, HTTP-only cookie scoped to the browser that completed OAuth.
+They are not shared through process memory, exposed to browser JavaScript, or persisted
+in an application database. Pinterest API content is returned with `no-store` and kept
+only in the current page state.
 
 ## Production deployment
 
 Set these variables in the Vercel project settings:
 
 ```bash
-SITE_URL=https://pinterest-integration.vercel.app
-SITE_DOMAIN=pinterest-integration.vercel.app
+SITE_URL=https://mdt07-visual-reference.vercel.app
+SITE_DOMAIN=mdt07-visual-reference.vercel.app
 PINTEREST_APP_ID=...
 PINTEREST_APP_SECRET=...
-PINTEREST_REDIRECT_URI=https://pinterest-integration.vercel.app/api/pinterest/auth/callback
-PINTEREST_ACCESS_TOKEN=...
-PINTEREST_REFRESH_TOKEN=...
-PINTEREST_TOKEN_EXPIRES_AT=...
+PINTEREST_REDIRECT_URI=https://mdt07-visual-reference.vercel.app/api/pinterest/auth/callback
+PINTEREST_SESSION_SECRET=...
 ```
 
 Redeploy after changing environment variables. Never use a temporary Vercel preview
@@ -124,10 +121,19 @@ Use these values only after the updated production deployment has been verified:
 
 | Pinterest field | Value |
 | --- | --- |
-| Company website / App link | `https://pinterest-integration.vercel.app/` |
-| Privacy Policy | `https://pinterest-integration.vercel.app/privacy` |
+| Company website / App link | `https://mdt07-visual-reference.vercel.app/` |
+| Privacy Policy | `https://mdt07-visual-reference.vercel.app/privacy` |
 | Redirect URI (local) | `http://localhost:3000/api/pinterest/auth/callback` |
-| Redirect URI (production) | `https://pinterest-integration.vercel.app/api/pinterest/auth/callback` |
+| Redirect URI (production) | `https://mdt07-visual-reference.vercel.app/api/pinterest/auth/callback` |
+
+Suggested access-request description:
+
+> MDT07 Visual Reference is a project-scoped creative research workspace for web
+> designers and developers. A user starts with a specific website or interface brief,
+> authorizes read-only Pinterest access, searches relevant public Pins, and compares
+> selected references in a temporary session workspace before creating original work.
+> Pinterest API content is not persisted, every Pin links to its original Pinterest
+> source, and the application requests only `pins:read`.
 
 ## Pinterest Sandbox
 
@@ -142,9 +148,9 @@ and [access tier requirements](https://developers.pinterest.com/docs/key-concept
 
 ## Repository rename
 
-The local package is named `mdt07-pinterest-reference`, while the remote repository is
-still `MDT07/visref-moodboard`. Renaming the GitHub repository does not automatically
-rename or reconfigure the Vercel production domain.
+The local package is named `mdt07-visual-reference`, while the remote repository remains
+`MDT07/visref-moodboard`. This repository name is already brand-neutral and does not need
+to change for the Vercel production alias.
 
 ## Contact
 

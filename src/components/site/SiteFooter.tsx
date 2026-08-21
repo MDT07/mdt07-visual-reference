@@ -13,13 +13,13 @@ export default function SiteFooter() {
     <footer className="border-t border-surface-2 bg-surface-1">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-[1fr_auto] md:items-end">
         <div className="max-w-2xl space-y-3">
-          <p className="font-semibold text-text-primary">MDT07 Pinterest Reference</p>
+          <p className="font-semibold text-text-primary">MDT07 Visual Reference</p>
           <p className="text-sm leading-6 text-text-secondary">
-            A web tool for discovering and exploring Pinterest visual references for
-            web design and development projects.
+            Project-scoped visual research for web design and development, with
+            transient references linked to their original Pinterest sources.
           </p>
           <p className="text-xs leading-5 text-text-tertiary">
-            MDT07 Pinterest Reference is an independent project and is not endorsed
+            MDT07 Visual Reference is an independent project and is not endorsed
             by, affiliated with, or an official product of Pinterest.
           </p>
         </div>

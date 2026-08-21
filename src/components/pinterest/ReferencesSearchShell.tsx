@@ -53,7 +53,6 @@ function toSessionReference(pin: PinterestPin, query: string): CuratedPin | null
     dominantColor: pin.dominant_color,
     authorUsername: pin.board_owner?.username,
     mediaType: pin.media.media_type,
-    usage: "reference",
     query,
     savedAt: new Date().toISOString(),
   };
@@ -81,7 +80,9 @@ export default function ReferencesSearchShell({
     const params = new URLSearchParams({ q });
     if (nextBookmark) params.set("bookmark", nextBookmark);
     try {
-      const res = await fetch(`/api/pinterest/search?${params.toString()}`);
+      const res = await fetch(`/api/pinterest/search?${params.toString()}`, {
+        cache: "no-store",
+      });
       if (!res.ok) {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(body.error ?? `Search failed: ${res.status}`);

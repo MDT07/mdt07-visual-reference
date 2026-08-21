@@ -15,7 +15,7 @@ export default function SiteHeader() {
         <Link
           href="/"
           className="inline-flex items-center gap-3 font-semibold tracking-tight text-text-primary"
-          aria-label="MDT07 Pinterest Reference home"
+          aria-label="MDT07 Visual Reference home"
         >
           <span
             aria-hidden="true"
@@ -23,7 +23,7 @@ export default function SiteHeader() {
           >
             M7
           </span>
-          <span>MDT07 Pinterest Reference</span>
+          <span>MDT07 Visual Reference</span>
         </Link>
 
         <nav aria-label="Primary navigation">

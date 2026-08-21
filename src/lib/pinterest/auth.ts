@@ -1,3 +1,5 @@
+import "server-only";
+
 import { assertPinterestConfigured, pinterestConfig } from "@/lib/config";
 import type { PinterestTokenResponse } from "./types";
 

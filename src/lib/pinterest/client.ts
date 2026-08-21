@@ -1,6 +1,11 @@
+import "server-only";
+
 import { pinterestConfig } from "@/lib/config";
 import { refreshAccessToken } from "./auth";
-import { getTokens, updateAccessToken } from "./token-store";
+import {
+  createPinterestSession,
+  type PinterestSession,
+} from "./session";
 import type {
   PinterestPin,
   PinterestSearchResponse,
@@ -17,38 +22,38 @@ export class PinterestError extends Error {
   }
 }
 
-async function ensureAccessToken(): Promise<string> {
-  const tokens = getTokens();
-  if (!tokens) {
-    throw new PinterestError(
-      "Pinterest tokens not configured. Complete OAuth first.",
-      401
-    );
-  }
-
+export async function ensurePinterestSession(
+  session: PinterestSession
+): Promise<{ session: PinterestSession; refreshed: boolean }> {
   const isExpiringSoon =
-    !tokens.expiresAt || tokens.expiresAt - Date.now() < 60 * 60 * 1000;
+    session.expiresAt - Date.now() < 60 * 60 * 1000;
 
-  if (isExpiringSoon && tokens.refreshToken) {
-    const refreshed = await refreshAccessToken(tokens.refreshToken);
-    updateAccessToken(
-      refreshed.access_token,
-      refreshed.expires_in,
-      refreshed.refresh_token
-    );
-    return refreshed.access_token;
+  if (isExpiringSoon && session.refreshToken) {
+    const refreshed = await refreshAccessToken(session.refreshToken);
+    return {
+      session: createPinterestSession(refreshed, session),
+      refreshed: true,
+    };
   }
 
-  return tokens.accessToken;
+  if (session.expiresAt <= Date.now()) {
+    throw new PinterestError("Pinterest authorization has expired.", 401);
+  }
+
+  return { session, refreshed: false };
 }
 
-async function pinterestFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = await ensureAccessToken();
+async function pinterestFetch<T>(
+  accessToken: string,
+  path: string,
+  options: RequestInit = {}
+): Promise<T> {
   const url = `${pinterestConfig.apiBase}${path}`;
   const res = await fetch(url, {
     ...options,
+    cache: "no-store",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
       ...options.headers,
     },
@@ -67,9 +72,15 @@ async function pinterestFetch<T>(path: string, options: RequestInit = {}): Promi
 }
 
 export async function searchPins(
+  session: PinterestSession,
   query: string,
   options: { pageSize?: number; bookmark?: string } = {}
-): Promise<PinterestSearchResponse> {
+): Promise<{
+  data: PinterestSearchResponse;
+  session: PinterestSession;
+  refreshed: boolean;
+}> {
+  const active = await ensurePinterestSession(session);
   const params = new URLSearchParams({
     q: query,
     page_size: String(options.pageSize ?? pinterestConfig.searchPageSize),
@@ -78,35 +89,17 @@ export async function searchPins(
     params.set("bookmark", options.bookmark);
   }
 
-  return pinterestFetch<PinterestSearchResponse>(`/search/pins?${params.toString()}`);
-}
-
-export async function listBoards(): Promise<{
-  items: unknown[];
-  bookmark?: string | null;
-}> {
-  return pinterestFetch("/boards");
-}
-
-export async function getPin(pinId: string): Promise<PinterestPin> {
-  return pinterestFetch(`/pins/${pinId}`);
-}
-
-export function getPinUrl(pinId: string): string {
-  return `https://www.pinterest.com/pin/${pinId}/`;
-}
-
-export function getBestImageUrl(pin: PinterestPin): string | undefined {
-  const images = pin.media?.images;
-  if (!images) return undefined;
-  return (
-    images["1200x"]?.url ??
-    images["600x"]?.url ??
-    images["400x300"]?.url ??
-    images["150x150"]?.url
+  const data = await pinterestFetch<PinterestSearchResponse>(
+    active.session.accessToken,
+    `/search/pins?${params.toString()}`
   );
+  return { data, session: active.session, refreshed: active.refreshed };
 }
 
-export function getAuthorUsername(pin: PinterestPin): string | undefined {
-  return pin.board_owner?.username;
+export async function getPin(
+  session: PinterestSession,
+  pinId: string
+): Promise<PinterestPin> {
+  const active = await ensurePinterestSession(session);
+  return pinterestFetch(active.session.accessToken, `/pins/${pinId}`);
 }

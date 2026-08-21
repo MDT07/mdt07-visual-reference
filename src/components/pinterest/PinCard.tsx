@@ -1,6 +1,10 @@
 import Image from "next/image";
 import type { PinterestPin } from "@/lib/pinterest/types";
-import { getBestImageUrl, getAuthorUsername, getPinUrl } from "@/lib/pinterest/client";
+import {
+  getBestImage,
+  getAuthorUsername,
+  getPinUrl,
+} from "@/lib/pinterest/presentation";
 
 interface PinCardProps {
   pin: PinterestPin;
@@ -8,7 +12,7 @@ interface PinCardProps {
 }
 
 export default function PinCard({ pin, footer }: PinCardProps) {
-  const imageUrl = getBestImageUrl(pin);
+  const image = getBestImage(pin);
   const author = getAuthorUsername(pin);
   const pinUrl = getPinUrl(pin.id);
 
@@ -20,14 +24,16 @@ export default function PinCard({ pin, footer }: PinCardProps) {
         rel="noopener noreferrer"
         className="block"
       >
-        {imageUrl ? (
-          <div className="relative aspect-[4/5] overflow-hidden bg-surface-2">
+        {image ? (
+          <div className="flex min-h-40 items-center justify-center bg-surface-2">
             <Image
-              src={imageUrl}
+              src={image.url}
               alt={pin.alt_text || pin.title || "Pinterest reference"}
-              fill
+              width={image.width}
+              height={image.height}
               sizes="(max-width: 768px) 50vw, 25vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              unoptimized
+              className="h-auto w-full object-contain"
             />
           </div>
         ) : (
@@ -45,6 +51,14 @@ export default function PinCard({ pin, footer }: PinCardProps) {
         {author && (
           <p className="mt-1 text-xs text-text-tertiary">@{author}</p>
         )}
+        <a
+          href={pinUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex text-xs text-accent hover:underline"
+        >
+          Open original on Pinterest
+        </a>
         {footer && <div className="mt-3">{footer}</div>}
       </div>
     </article>

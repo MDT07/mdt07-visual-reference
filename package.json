@@ -1,7 +1,7 @@
 {
-  "name": "mdt07-pinterest-reference",
+  "name": "mdt07-visual-reference",
   "version": "0.1.0",
-  "description": "A web tool for discovering and exploring Pinterest visual references for web design and development projects.",
+  "description": "A project-scoped visual research workspace for web design and development.",
   "private": true,
   "scripts": {
     "dev": "next dev",

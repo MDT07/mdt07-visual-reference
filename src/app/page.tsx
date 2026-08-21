@@ -1,5 +1,5 @@
 import { getPublicUrl, isPinterestConfigured } from "@/lib/config";
-import { getTokens } from "@/lib/pinterest/token-store";
+import { getPinterestSessionFromCookies } from "@/lib/pinterest/session";
 import ReferencesSearchShell from "@/components/pinterest/ReferencesSearchShell";
 import type { Metadata } from "next";
 
@@ -7,12 +7,12 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   description:
-    "Discover and explore Pinterest visual references for web design and development projects, then curate useful ideas into a working moodboard.",
+    "Turn a web-project brief into a focused, temporary visual reference workspace with source-linked Pinterest results.",
   alternates: { canonical: getPublicUrl() },
   openGraph: {
-    title: "MDT07 Pinterest Reference",
+    title: "MDT07 Visual Reference",
     description:
-      "Discover and explore Pinterest visual references for web design and development projects.",
+      "Project-scoped visual research for web design and development, with transient Pinterest references and original-source links.",
     url: getPublicUrl(),
   },
 };
@@ -30,9 +30,9 @@ const PRESETS = [
   "luxury brand",
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
   const configured = isPinterestConfigured();
-  const connected = Boolean(getTokens());
+  const connected = configured && Boolean(await getPinterestSessionFromCookies());
 
   return (
     <main>
@@ -43,17 +43,17 @@ export default function HomePage() {
               Visual research for the web
             </p>
             <h1 className="max-w-4xl text-4xl font-semibold leading-tight tracking-[-0.04em] text-text-primary sm:text-5xl md:text-6xl">
-              MDT07 Pinterest Reference
+              MDT07 Visual Reference
             </h1>
             <p className="max-w-3xl text-lg leading-8 text-text-secondary md:text-xl">
-              A web tool for discovering and exploring Pinterest visual references
-              for web design and development projects.
+              A project-scoped workspace for discovering and comparing visual
+              references while planning an original website or interface.
             </p>
           </div>
           <div className="rounded-2xl border border-surface-2 bg-surface-1 p-6">
             <p className="text-sm leading-6 text-text-secondary">
-              Built for web designers, developers, and creative teams who need a
-              focused way to research visual direction before they build.
+              Built for web designers, developers, and creative teams who want to
+              turn a specific project brief into a focused research session.
             </p>
           </div>
         </div>
@@ -65,24 +65,24 @@ export default function HomePage() {
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">01</p>
             <h2 className="text-xl font-semibold text-text-primary">Find a direction</h2>
             <p className="leading-7 text-text-secondary">
-              Search for a visual style, layout language, art direction, or product
-              presentation relevant to a web project.
+              Define the visual style, layout language, art direction, or product
+              presentation needed for one specific web project.
             </p>
           </div>
           <div className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">02</p>
             <h2 className="text-xl font-semibold text-text-primary">Explore sources</h2>
             <p className="leading-7 text-text-secondary">
-              Review relevant Pins through Pinterest data, with links back to the
-              original Pinterest source for deeper exploration.
+              Explore relevant results provided through the Pinterest API. Every
+              reference links back to its original source on Pinterest.
             </p>
           </div>
           <div className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">03</p>
             <h2 className="text-xl font-semibold text-text-primary">Curate references</h2>
             <p className="leading-7 text-text-secondary">
-              Save useful discoveries to a moodboard and use them as inspiration for
-              an original website or interface.
+              Compare selected references in a temporary session workspace, then use
+              the research to make original design decisions.
             </p>
           </div>
         </div>
@@ -90,6 +90,11 @@ export default function HomePage() {
           The application helps organize visual research. It does not automatically
           copy Pinterest content or transfer ownership of it. Pinterest remains the
           source for the referenced Pins.
+        </p>
+        <p className="mt-5 max-w-4xl text-sm leading-6 text-text-tertiary">
+          This is not a replacement client for Pinterest. The added workflow is scoped
+          to a web-project brief, keeps selections only for the open session, and helps
+          designers compare references before creating their own work.
         </p>
       </section>
 
@@ -105,9 +110,19 @@ export default function HomePage() {
               </h2>
             </div>
             {connected ? (
-              <span className="inline-flex w-fit rounded-full border border-green-300 bg-green-50 px-4 py-2 text-xs text-green-800">
-                Pinterest access is connected
-              </span>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="inline-flex w-fit rounded-full border border-green-300 bg-green-50 px-4 py-2 text-xs text-green-800">
+                  Pinterest access is connected for this session
+                </span>
+                <form action="/api/pinterest/auth/disconnect" method="post">
+                  <button
+                    type="submit"
+                    className="text-xs text-text-secondary underline-offset-4 hover:underline"
+                  >
+                    Disconnect
+                  </button>
+                </form>
+              </div>
             ) : configured ? (
               <a
                 href="/api/pinterest/auth"
@@ -117,7 +132,7 @@ export default function HomePage() {
               </a>
             ) : (
               <span className="inline-flex w-fit rounded-full border border-surface-3 px-4 py-2 text-xs text-text-tertiary">
-                Pinterest connection is being configured
+                Pinterest API access is pending configuration
               </span>
             )}
           </div>
@@ -147,7 +162,7 @@ export default function HomePage() {
       <section className="border-t border-surface-2 bg-surface-1">
         <div className="mx-auto max-w-6xl px-4 py-12">
           <p className="max-w-4xl text-sm leading-6 text-text-secondary">
-            MDT07 Pinterest Reference is an independent application. It is not
+            MDT07 Visual Reference is an independent application. It is not
             endorsed by, affiliated with, or an official product of Pinterest.
           </p>
         </div>
