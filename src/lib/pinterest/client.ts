@@ -96,6 +96,34 @@ export async function searchPins(
   return { data, session: active.session, refreshed: active.refreshed };
 }
 
+export async function searchPinsAllPages(
+  session: PinterestSession,
+  query: string,
+  options: { pageSize?: number; maxPages?: number } = {}
+): Promise<{
+  pins: PinterestPin[];
+  session: PinterestSession;
+  refreshed: boolean;
+}> {
+  const pageSize = options.pageSize ?? pinterestConfig.searchPageSize;
+  const maxPages = options.maxPages ?? 2;
+  const pins: PinterestPin[] = [];
+  let bookmark: string | undefined;
+  let activeSession = session;
+  let refreshed = false;
+
+  for (let page = 0; page < maxPages; page++) {
+    const result = await searchPins(activeSession, query, { pageSize, bookmark });
+    pins.push(...result.data.items);
+    activeSession = result.session;
+    refreshed = refreshed || result.refreshed;
+    bookmark = result.data.bookmark ?? undefined;
+    if (!bookmark) break;
+  }
+
+  return { pins, session: activeSession, refreshed };
+}
+
 export async function getPin(
   session: PinterestSession,
   pinId: string
