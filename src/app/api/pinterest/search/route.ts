@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { searchPins } from "@/lib/pinterest/client";
+import { runSearchPipeline } from "@/lib/search/pipeline";
 import { PinterestError } from "@/lib/pinterest/client";
 import {
   clearPinterestSession,
   getPinterestSessionFromRequest,
-  setPinterestSession,
 } from "@/lib/pinterest/session";
 import { checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
 
@@ -13,8 +12,13 @@ export const revalidate = 0;
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const searchParams = request.nextUrl.searchParams;
-  const query = searchParams.get("q");
-  const bookmark = searchParams.get("bookmark") ?? undefined;
+  const prompt = searchParams.get("q");
+  const mode = searchParams.get("mode") as
+    | "inspiration"
+    | "precision"
+    | "premium"
+    | "experimental"
+    | null;
   const session = getPinterestSessionFromRequest(request);
 
   if (!session) {
@@ -32,33 +36,34 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  if (!query || query.trim().length === 0) {
+  if (!prompt || prompt.trim().length === 0) {
     return NextResponse.json({ error: "Missing query" }, { status: 400 });
   }
 
-  if (query.length > 200) {
+  if (prompt.length > 500) {
     return NextResponse.json({ error: "Query too long" }, { status: 400 });
   }
 
-  if (bookmark && bookmark.length > 1_024) {
-    return NextResponse.json({ error: "Invalid bookmark" }, { status: 400 });
-  }
-
   try {
-    const result = await searchPins(session, query.trim(), { bookmark });
-    const response = NextResponse.json(result.data, {
+    const result = await runSearchPipeline(session, {
+      prompt: prompt.trim(),
+      mode: mode ?? "inspiration",
+      limit: 30,
+      maxQueries: 5,
+      maxPagesPerQuery: 2,
+    });
+
+    return NextResponse.json(result, {
       headers: {
         ...rateLimitHeaders(rateLimit),
         "Cache-Control": "no-store, max-age=0",
         Pragma: "no-cache",
       },
     });
-    if (result.refreshed) setPinterestSession(response, result.session);
-    return response;
   } catch (err) {
     const status = err instanceof PinterestError ? err.status : 500;
     console.error(
-      "Pinterest search failed:",
+      "Search pipeline failed:",
       err instanceof Error ? err.message : "Unknown error"
     );
     const response = NextResponse.json(
@@ -67,8 +72,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           status === 401
             ? "Pinterest authorization has expired. Connect again."
             : status === 429
-              ? "Pinterest rate limit reached. Try again later."
-              : "Pinterest search is temporarily unavailable.",
+            ? "Pinterest rate limit reached. Try again later."
+            : "Pinterest search is temporarily unavailable.",
       },
       { status, headers: { "Cache-Control": "no-store" } }
     );
