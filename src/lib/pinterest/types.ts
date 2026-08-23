@@ -85,3 +85,48 @@ export interface CuratedPin {
   query: string;
   savedAt: string;
 }
+
+export interface VisualReference {
+  id: string;
+  source: "pinterest";
+  sourceId: string;
+  sourceUrl: string;
+
+  title?: string;
+  description?: string;
+  altText?: string;
+
+  imageUrl?: string;
+  thumbnailUrl?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  aspectRatio?: number;
+  dominantColor?: string;
+
+  link?: string;
+  authorUsername?: string;
+  boardId?: string;
+  boardName?: string;
+
+  creativeType?: string;
+  tags?: string[];
+
+  designAttributes?: {
+    layout?: string[];
+    typography?: string[];
+    colorPalette?: string[];
+    imagery?: string[];
+    navigation?: string[];
+    effects?: string[];
+    composition?: string[];
+    spacing?: string[];
+    motion?: string[];
+  };
+
+  relevanceScore?: number;
+  qualityScore?: number;
+  finalScore?: number;
+
+  rawQuery?: string;
+  fetchedAt: string;
+}
