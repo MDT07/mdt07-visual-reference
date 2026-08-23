@@ -1,8 +1,9 @@
 import Image from "next/image";
-import type { CuratedPin } from "@/lib/pinterest/types";
+
+import type { VisualReference } from "@/lib/pinterest/types";
 
 interface MoodboardGridProps {
-  pins: CuratedPin[];
+  pins: VisualReference[];
   labels: {
     attribution: string;
     originalPin: string;
@@ -30,7 +31,7 @@ export default function MoodboardGrid({ pins, labels }: MoodboardGridProps) {
           >
             <div className="flex min-h-40 items-center justify-center bg-surface-2">
               <Image
-                src={pin.imageUrl}
+                src={pin.imageUrl ?? pin.thumbnailUrl ?? ""}
                 alt={pin.altText || pin.title || "Reference"}
                 width={pin.imageWidth ?? 600}
                 height={pin.imageHeight ?? 750}
