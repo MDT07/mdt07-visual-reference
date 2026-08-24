@@ -13,6 +13,9 @@
 # production
 /build
 
+# local demo recordings and screenshots
+/artifacts/
+
 # misc
 .DS_Store
 *.pem
