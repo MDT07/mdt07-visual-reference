@@ -47,6 +47,7 @@ export default function ReferencesSearchShell({
     strategies: SearchPipelineResult["strategies"];
     candidates: number;
     duplicatesRemoved: number;
+    boardName: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -120,6 +121,8 @@ export default function ReferencesSearchShell({
         strategies: data.strategies,
         candidates: data.candidates,
         duplicatesRemoved: data.duplicatesRemoved,
+        boardName:
+          boards.find((board) => board.id === selectedBoardId)?.name ?? "Selected board",
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -164,6 +167,12 @@ export default function ReferencesSearchShell({
             Only public boards returned by Pinterest are shown. Secret boards and secret Pins are not requested.
           </p>
           {boardsError && <p className="text-sm text-red-600">{boardsError}</p>}
+          {!boardsLoading && !boardsError && boards.length === 0 && (
+            <p className="rounded-md border border-surface-3 bg-surface-1 p-3 text-sm leading-6 text-text-secondary">
+              No public boards were returned for this account. Create or save Pins to a
+              public board in Pinterest, then refresh this page before recording the demo.
+            </p>
+          )}
         </div>
       )}
       <SearchForm
@@ -184,6 +193,10 @@ export default function ReferencesSearchShell({
             {pipelineMeta.duplicatesRemoved} duplicates removed)
           </summary>
           <div className="mt-3 space-y-2">
+            <p>
+              <span className="font-medium">Source board:</span>{" "}
+              {pipelineMeta.boardName}
+            </p>
             <p>
               <span className="font-medium">Parsed brief:</span>{" "}
               {pipelineMeta.brief.industry || "—"} /{" "}
