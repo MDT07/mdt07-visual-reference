@@ -4,9 +4,27 @@ Machine-readable endpoints for Claude Code, Codex, Kimi, Cursor, and other AI co
 
 ## Authentication
 
-All agent endpoints require an active Pinterest OAuth session. The user must first click **Connect Pinterest** in the UI. The session is stored in an HTTP-only cookie.
+The Agent API is a developer-only feature and is disabled by default. To enable it
+for a controlled local or private environment, set:
 
-For server-to-server use, call the endpoints from the same browser session or extend authentication later.
+```bash
+AGENT_API_ENABLED=true
+AGENT_API_KEY=<strong-random-value>
+```
+
+Every request must include the server-side key:
+
+```http
+Authorization: Bearer <AGENT_API_KEY>
+```
+
+Pinterest search additionally requires an active Pinterest OAuth session. The user
+must first click **Connect Pinterest** in the UI; that session remains in an
+HTTP-only cookie.
+
+Keep the Agent API disabled on the public Pinterest review deployment. The local
+JSON project store is not suitable for Vercel production and must not be used to
+persist Pinterest API content there.
 
 ## POST /api/agent/search
 

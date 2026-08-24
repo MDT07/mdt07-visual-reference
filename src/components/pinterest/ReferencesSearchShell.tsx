@@ -34,7 +34,6 @@ export default function ReferencesSearchShell({
   labels,
   moodboardLabels,
 }: ReferencesSearchShellProps) {
-  const [query, setQuery] = useState(presets[0] ?? "");
   const [items, setItems] = useState<VisualReference[]>([]);
   const [pipelineMeta, setPipelineMeta] = useState<{
     brief: SearchPipelineResult["brief"];
@@ -83,7 +82,6 @@ export default function ReferencesSearchShell({
       <SearchForm
         presets={presets}
         onSearch={(q) => {
-          setQuery(q);
           void performSearch(q);
         }}
         isLoading={isLoading}

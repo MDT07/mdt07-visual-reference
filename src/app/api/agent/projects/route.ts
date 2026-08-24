@@ -1,20 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { requireAgentApiAuth } from "@/lib/agent-auth";
 import {
   createProject,
   deleteProject,
-  getProject,
   listProjects,
 } from "@/lib/store/projects";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(): Promise<NextResponse> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  const authError = requireAgentApiAuth(request);
+  if (authError) return authError;
+
   const projects = await listProjects();
   return NextResponse.json({ projects });
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  const authError = requireAgentApiAuth(request);
+  if (authError) return authError;
+
   const body = (await request.json().catch(() => ({}))) as {
     name?: string;
     brief?: string;
@@ -32,6 +38,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 }
 
 export async function DELETE(request: NextRequest): Promise<NextResponse> {
+  const authError = requireAgentApiAuth(request);
+  if (authError) return authError;
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 

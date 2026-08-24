@@ -16,6 +16,7 @@ export interface PinterestSession {
   refreshToken?: string;
   expiresAt: number;
   refreshExpiresAt?: number;
+  scope?: string;
 }
 
 const SESSION_COOKIE_PRODUCTION = "__Host-mdt07-vref-pinterest-session";
@@ -55,7 +56,8 @@ function isPinterestSession(value: unknown): value is PinterestSession {
       typeof candidate.refreshToken === "string") &&
     (candidate.refreshExpiresAt === undefined ||
       (typeof candidate.refreshExpiresAt === "number" &&
-        Number.isFinite(candidate.refreshExpiresAt)))
+        Number.isFinite(candidate.refreshExpiresAt))) &&
+    (candidate.scope === undefined || typeof candidate.scope === "string")
   );
 }
 
@@ -75,6 +77,7 @@ export function createPinterestSession(
     refreshToken: tokens.refresh_token ?? previous?.refreshToken,
     expiresAt: now + tokens.expires_in * 1000,
     refreshExpiresAt,
+    scope: tokens.scope ?? previous?.scope,
   };
 }
 
@@ -153,5 +156,11 @@ export function setPinterestSession(
 }
 
 export function clearPinterestSession(response: NextResponse): void {
-  response.cookies.delete(pinterestSessionCookieName);
+  response.cookies.set(pinterestSessionCookieName, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    expires: new Date(0),
+    path: "/",
+  });
 }

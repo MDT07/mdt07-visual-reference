@@ -26,7 +26,7 @@ export default function PrivacyPage() {
       />
 
       <div className="legal-content py-12">
-        <p><strong>Last updated:</strong> August 21, 2026</p>
+        <p><strong>Last updated:</strong> August 24, 2026</p>
 
         <section>
           <h2>1. Scope of this policy</h2>
@@ -127,7 +127,8 @@ export default function PrivacyPage() {
             Pinterest search responses are returned with instructions not to cache and
             are kept only in the memory of the open page. Pinterest images are loaded
             from their original remote source without the Application’s image optimization
-            cache. OAuth state cookies expire after approximately ten minutes. A one-way
+            cache. The developer-only Agent API and its local project store are disabled
+            on the public production website. OAuth state cookies expire after approximately ten minutes. A one-way
             identifier derived from request and session information may remain briefly
             in an individual server instance to enforce one-minute request windows,
             until routine cleanup or instance recycling.

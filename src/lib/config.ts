@@ -24,13 +24,18 @@ export function getPublicUrl(path = "/"): string {
 }
 
 export const pinterestConfig = {
-  appId: process.env.PINTEREST_APP_ID ?? "",
-  appSecret: process.env.PINTEREST_APP_SECRET ?? "",
-  redirectUri: process.env.PINTEREST_REDIRECT_URI ?? "",
+  appId: process.env.PINTEREST_APP_ID?.trim() ?? "",
+  appSecret: process.env.PINTEREST_APP_SECRET?.trim() ?? "",
+  redirectUri: process.env.PINTEREST_REDIRECT_URI?.trim() ?? "",
   sessionSecret: process.env.PINTEREST_SESSION_SECRET ?? "",
   apiBase: process.env.PINTEREST_API_BASE ?? "https://api.pinterest.com/v5",
   searchPageSize: Number(process.env.PINTEREST_SEARCH_PAGE_SIZE ?? 25),
   scopes: ["pins:read"] as const,
+} as const;
+
+export const agentApiConfig = {
+  enabled: process.env.AGENT_API_ENABLED === "true",
+  apiKey: process.env.AGENT_API_KEY ?? "",
 } as const;
 
 export const isPinterestConfigured = (): boolean =>

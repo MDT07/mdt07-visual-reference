@@ -44,7 +44,7 @@ export async function ensurePinterestSession(
 }
 
 async function pinterestFetch<T>(
-  accessToken: string,
+  session: PinterestSession,
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
@@ -53,7 +53,7 @@ async function pinterestFetch<T>(
     ...options,
     cache: "no-store",
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${session.accessToken}`,
       "Content-Type": "application/json",
       ...options.headers,
     },
@@ -61,6 +61,11 @@ async function pinterestFetch<T>(
 
   if (!res.ok) {
     const body = (await res.json().catch(() => ({}))) as unknown;
+    console.error("Pinterest API error", {
+      status: res.status,
+      endpoint: new URL(res.url).pathname,
+      scope: session.scope,
+    });
     throw new PinterestError(
       `Pinterest API error: ${res.status}`,
       res.status,
@@ -90,7 +95,7 @@ export async function searchPins(
   }
 
   const data = await pinterestFetch<PinterestSearchResponse>(
-    active.session.accessToken,
+    active.session,
     `/search/pins?${params.toString()}`
   );
   return { data, session: active.session, refreshed: active.refreshed };
@@ -129,5 +134,5 @@ export async function getPin(
   pinId: string
 ): Promise<PinterestPin> {
   const active = await ensurePinterestSession(session);
-  return pinterestFetch(active.session.accessToken, `/pins/${pinId}`);
+  return pinterestFetch(active.session, `/pins/${pinId}`);
 }

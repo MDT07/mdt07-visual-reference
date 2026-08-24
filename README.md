@@ -91,6 +91,10 @@ PINTEREST_SESSION_SECRET=
 
 PINTEREST_API_BASE=https://api.pinterest.com/v5
 PINTEREST_SEARCH_PAGE_SIZE=25
+
+# Optional developer-only endpoints; keep disabled for the public review site
+AGENT_API_ENABLED=false
+AGENT_API_KEY=
 ```
 
 `PINTEREST_SESSION_SECRET` must contain at least 32 random characters. OAuth tokens are
@@ -98,6 +102,11 @@ encrypted into a Secure, HTTP-only cookie scoped to the browser that completed O
 They are not shared through process memory, exposed to browser JavaScript, or persisted
 in an application database. Pinterest API content is returned with `no-store` and kept
 only in the current page state.
+
+The optional `/api/agent/*` endpoints are disabled unless
+`AGENT_API_ENABLED=true` and require a server-side bearer key when enabled. They
+must remain disabled on the public Pinterest review deployment unless their data
+handling and storage are separately reviewed and documented.
 
 ## Production deployment
 

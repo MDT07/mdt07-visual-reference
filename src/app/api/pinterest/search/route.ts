@@ -49,8 +49,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       prompt: prompt.trim(),
       mode: mode ?? "inspiration",
       limit: 30,
-      maxQueries: 5,
-      maxPagesPerQuery: 2,
+      maxQueries: 3,
+      maxPagesPerQuery: 1,
     });
 
     return NextResponse.json(result, {

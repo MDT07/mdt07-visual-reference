@@ -17,8 +17,8 @@ export async function runSearchPipeline(
   const brief = parseDesignBrief(input.prompt);
   const mode = input.mode ?? "inspiration";
   const limit = input.limit ?? brief.quantity;
-  const maxQueries = input.maxQueries ?? 6;
-  const maxPagesPerQuery = input.maxPagesPerQuery ?? 2;
+  const maxQueries = input.maxQueries ?? 3;
+  const maxPagesPerQuery = input.maxPagesPerQuery ?? 1;
 
   const strategies = generateSearchStrategies(brief, mode).slice(0, maxQueries);
   const execution = await executeSearchStrategies(session, strategies, {

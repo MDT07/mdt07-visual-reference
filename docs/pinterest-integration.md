@@ -14,6 +14,8 @@ MDT07 Visual Reference uses the official Pinterest API v5 with read-only access 
 | `PINTEREST_SESSION_SECRET` | At least 32 random characters; encrypts the OAuth session cookie |
 | `PINTEREST_API_BASE` | `https://api.pinterest.com/v5` or sandbox host |
 | `PINTEREST_SEARCH_PAGE_SIZE` | Pinterest search page size |
+| `AGENT_API_ENABLED` | Explicit opt-in for developer-only `/api/agent/*` endpoints; defaults to disabled |
+| `AGENT_API_KEY` | Server-side bearer key required when the Agent API is enabled |
 
 ## Search pipeline
 
@@ -48,12 +50,15 @@ Final References
 - Pipeline generates multiple Pinterest queries, fetches pages, merges, deduplicates, scores, and ranks results.
 - Results are returned as `SearchPipelineResult` and displayed in the UI.
 
-## Project storage
+## Optional developer project storage
 
-Research projects and collections are stored in `data/projects.json` for single-user deployments. Each reference keeps its original Pinterest source URL and ID for attribution.
+The developer-only Agent API can store research projects and collections in
+`data/projects.json` for local, single-user testing. It is disabled by default and
+must remain disabled on the public Pinterest review deployment. The public web UI
+does not call this store; its moodboard remains only in the open browser page.
 
 ## Limitations
 
 - Pinterest Trial Access allows only `pins:read`.
-- Saving a reference does not create a Pin on Pinterest; it is stored locally.
+- The optional JSON project store is not suitable for Vercel production runtime.
 - AI visual analysis is planned as a future enhancement.

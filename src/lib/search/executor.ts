@@ -3,7 +3,6 @@ import "server-only";
 import { searchPinsAllPages } from "@/lib/pinterest/client";
 import type { PinterestSession } from "@/lib/pinterest/session";
 import type { PinterestPin } from "@/lib/pinterest/types";
-import { getCachedPins, setCachedPins } from "./cache";
 import type { SearchStrategy } from "./types";
 
 export async function executeSearchStrategies(
@@ -20,19 +19,12 @@ export async function executeSearchStrategies(
   const results: { strategy: SearchStrategy; pins: PinterestPin[] }[] = [];
 
   for (const strategy of strategies) {
-    const cached = getCachedPins(strategy.query);
-    if (cached) {
-      results.push({ strategy, pins: cached });
-      continue;
-    }
-
     const res = await searchPinsAllPages(activeSession, strategy.query, {
       pageSize: options.pageSize,
       maxPages: options.maxPagesPerQuery,
     });
     activeSession = res.session;
     refreshed = refreshed || res.refreshed;
-    setCachedPins(strategy.query, res.pins);
     results.push({ strategy, pins: res.pins });
   }
 

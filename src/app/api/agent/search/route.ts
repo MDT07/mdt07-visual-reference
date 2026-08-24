@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { requireAgentApiAuth } from "@/lib/agent-auth";
 import { runSearchPipeline } from "@/lib/search/pipeline";
 import { getPinterestSessionFromRequest } from "@/lib/pinterest/session";
 import { checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
@@ -8,6 +9,9 @@ import type { SearchMode } from "@/lib/search/types";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  const authError = requireAgentApiAuth(request);
+  if (authError) return authError;
+
   const session = getPinterestSessionFromRequest(request);
   if (!session) {
     return NextResponse.json(
@@ -44,8 +48,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     prompt: body.prompt,
     mode: body.mode ?? "premium",
     limit: body.limit ?? 20,
-    maxQueries: 5,
-    maxPagesPerQuery: 2,
+    maxQueries: 3,
+    maxPagesPerQuery: 1,
   });
 
   return NextResponse.json(result, {
