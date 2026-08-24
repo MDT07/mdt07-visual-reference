@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { VisualReference } from "@/lib/pinterest/types";
 import type { SearchPipelineResult } from "@/lib/search/types";
@@ -28,6 +28,13 @@ interface ReferencesSearchShellProps {
   };
 }
 
+interface PublicBoardOption {
+  id: string;
+  name: string;
+  pinCount: number;
+  ownerUsername?: string;
+}
+
 export default function ReferencesSearchShell({
   presets,
   isAvailable,
@@ -44,9 +51,52 @@ export default function ReferencesSearchShell({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [boards, setBoards] = useState<PublicBoardOption[]>([]);
+  const [selectedBoardId, setSelectedBoardId] = useState("");
+  const [boardsLoading, setBoardsLoading] = useState(isAvailable);
+  const [boardsError, setBoardsError] = useState<string | null>(null);
   const [sessionReferences, setSessionReferences] = useState<VisualReference[]>(
     []
   );
+
+  useEffect(() => {
+    if (!isAvailable) {
+      setBoardsLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const loadBoards = async () => {
+      setBoardsLoading(true);
+      setBoardsError(null);
+      try {
+        const response = await fetch("/api/pinterest/boards", {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        const body = (await response.json().catch(() => ({}))) as {
+          boards?: PublicBoardOption[];
+          error?: string;
+        };
+        if (!response.ok) {
+          throw new Error(body.error ?? `Board loading failed: ${response.status}`);
+        }
+        const publicBoards = body.boards ?? [];
+        setBoards(publicBoards);
+        setSelectedBoardId((current) => current || publicBoards[0]?.id || "");
+      } catch (loadError) {
+        if (loadError instanceof DOMException && loadError.name === "AbortError") return;
+        setBoardsError(
+          loadError instanceof Error ? loadError.message : "Public boards could not be loaded."
+        );
+      } finally {
+        if (!controller.signal.aborted) setBoardsLoading(false);
+      }
+    };
+
+    void loadBoards();
+    return () => controller.abort();
+  }, [isAvailable]);
 
   const performSearch = async (q: string) => {
     if (!isAvailable) return;
@@ -55,7 +105,8 @@ export default function ReferencesSearchShell({
     setError(null);
 
     try {
-      const res = await fetch(`/api/pinterest/search?q=${encodeURIComponent(q)}`, {
+      const params = new URLSearchParams({ q, boardId: selectedBoardId });
+      const res = await fetch(`/api/pinterest/search?${params.toString()}`, {
         cache: "no-store",
       });
       if (!res.ok) {
@@ -79,13 +130,49 @@ export default function ReferencesSearchShell({
 
   return (
     <div className="space-y-10">
+      {isAvailable && (
+        <div className="space-y-2">
+          <label
+            className="block text-sm font-medium text-text-primary"
+            htmlFor="pinterest-source-board"
+          >
+            Public Pinterest board
+          </label>
+          <select
+            id="pinterest-source-board"
+            value={selectedBoardId}
+            onChange={(event) => {
+              setSelectedBoardId(event.target.value);
+              setItems([]);
+              setPipelineMeta(null);
+              setHasSearched(false);
+            }}
+            disabled={boardsLoading || boards.length === 0}
+            className="w-full rounded-md border border-surface-3 bg-surface-0 px-4 py-2 text-sm text-text-primary focus:border-accent focus:outline-none disabled:opacity-60"
+          >
+            {boardsLoading && <option value="">Loading public boards…</option>}
+            {!boardsLoading && boards.length === 0 && (
+              <option value="">No public boards available</option>
+            )}
+            {boards.map((board) => (
+              <option key={board.id} value={board.id}>
+                {board.name} ({board.pinCount} {board.pinCount === 1 ? "Pin" : "Pins"})
+              </option>
+            ))}
+          </select>
+          <p className="text-xs leading-5 text-text-tertiary">
+            Only public boards returned by Pinterest are shown. Secret boards and secret Pins are not requested.
+          </p>
+          {boardsError && <p className="text-sm text-red-600">{boardsError}</p>}
+        </div>
+      )}
       <SearchForm
         presets={presets}
         onSearch={(q) => {
           void performSearch(q);
         }}
         isLoading={isLoading}
-        isDisabled={!isAvailable}
+        isDisabled={!isAvailable || boardsLoading || !selectedBoardId}
         labels={{ placeholder: labels.placeholder, button: labels.button }}
       />
       {error && <p className="text-sm text-red-600">{error}</p>}

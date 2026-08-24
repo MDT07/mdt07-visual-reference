@@ -23,6 +23,7 @@ export async function runSearchPipeline(
   const strategies = generateSearchStrategies(brief, mode).slice(0, maxQueries);
   const execution = await executeSearchStrategies(session, strategies, {
     maxPagesPerQuery,
+    boardId: input.boardId,
   });
 
   const flatPins = execution.results.flatMap((result) =>

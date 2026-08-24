@@ -47,8 +47,8 @@ export default async function HomePage() {
             </h1>
             <p className="max-w-3xl text-lg leading-8 text-text-secondary md:text-xl">
               A project-scoped workspace for discovering and comparing visual
-              references from your public Pinterest Pins while planning an original
-              website or interface.
+              references from public boards connected to your Pinterest account while
+              planning an original website or interface.
             </p>
           </div>
           <div className="rounded-2xl border border-surface-2 bg-surface-1 p-6">
@@ -74,8 +74,9 @@ export default async function HomePage() {
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">02</p>
             <h2 className="text-xl font-semibold text-text-primary">Explore sources</h2>
             <p className="leading-7 text-text-secondary">
-              Explore public Pins owned by your connected Pinterest account. Every
-              reference links back to its original source on Pinterest.
+              Choose one of the public boards available to your connected Pinterest
+              account, then rank its Pins against a project brief. Every reference links
+              back to its original source on Pinterest.
             </p>
           </div>
           <div className="space-y-3">
@@ -148,7 +149,7 @@ export default async function HomePage() {
               loadMore: "Load more",
               noResults: "No results found",
               initial: connected
-                ? "Your public Pinterest Pins will appear here after a search."
+                ? "Choose a public board, then describe the direction you want to explore."
                 : "Search becomes available after Pinterest access is connected.",
             }}
             moodboardLabels={{

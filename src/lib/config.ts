@@ -8,7 +8,7 @@ const siteUrl = (
 export const siteConfig = {
   name: "MDT07 Visual Reference",
   description:
-    "A project-scoped visual research workspace that ranks public Pins from a connected Pinterest account and links to their original sources.",
+    "A project-scoped visual research workspace that ranks Pins from public boards available to a connected Pinterest account and links to their original sources.",
   contactEmail: "emirsemenov@yahoo.com",
   githubUrl: "https://github.com/MDT07",
   githubUsername: "MDT07",

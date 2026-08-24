@@ -29,6 +29,7 @@ export function toVisualReference(
     dominantColor: pin.dominant_color,
     link: pin.link,
     authorUsername: pin.board_owner?.username,
+    boardId: pin.board_id,
     designAttributes: {},
     rawQuery: query,
     fetchedAt: new Date().toISOString(),

@@ -28,8 +28,18 @@ export interface PinterestBoardOwner {
   username?: string;
 }
 
+export interface PinterestBoard {
+  id: string;
+  name: string;
+  description?: string;
+  privacy?: "PUBLIC" | "PROTECTED" | "SECRET";
+  pin_count?: number;
+  owner?: PinterestBoardOwner;
+}
+
 export interface PinterestPin {
   id: string;
+  board_id?: string;
   title?: string;
   description?: string;
   alt_text?: string;
@@ -47,6 +57,11 @@ export interface PinterestPin {
 
 export interface PinterestSearchResponse {
   items: PinterestPin[];
+  bookmark?: string | null;
+}
+
+export interface PinterestBoardsResponse {
+  items: PinterestBoard[];
   bookmark?: string | null;
 }
 

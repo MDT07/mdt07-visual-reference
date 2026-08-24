@@ -26,7 +26,7 @@ the product pages, Privacy Policy, and OAuth callback use one stable production 
 
 - Public Home, About, Privacy Policy, Terms of Service, and Contact pages
 - Pinterest OAuth 2.0 with a short-lived state cookie
-- Read-only retrieval of the connected account's public Pins through Pinterest API v5
+- Read-only listing of public boards and retrieval of Pins from the board selected by the connected user through Pinterest API v5
   using `boards:read` and `pins:read`
 - Per-browser encrypted HTTP-only token sessions; no shared user token
 - Authenticated API routes with short-lived rate limiting
@@ -140,8 +140,8 @@ Suggested access-request description:
 
 > MDT07 Visual Reference is a project-scoped creative research workspace for web
 > designers and developers. A user starts with a specific website or interface brief,
-> authorizes read-only Pinterest access, retrieves public Pins owned by the connected
-> account, and ranks them against a project brief before the user compares selected
+> authorizes read-only Pinterest access, chooses a public board available to the connected
+> account, and ranks its Pins against a project brief before the user compares selected
 > references in a temporary session workspace and creates original work.
 > Pinterest API content is not persisted, every Pin links to its original Pinterest
 > source, and the application requests only `boards:read` and `pins:read`.

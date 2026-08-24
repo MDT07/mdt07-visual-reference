@@ -3,8 +3,9 @@
 ## Overview
 
 MDT07 Visual Reference uses the official Pinterest API v5 with read-only access
-(`boards:read` and `pins:read`). It retrieves public Pins owned by the connected
-Pinterest account and ranks them locally against the user's project brief. All
+(`boards:read` and `pins:read`). It lists public boards available to the connected
+Pinterest account, retrieves Pins from the board selected by the user, and ranks them
+locally against the user's project brief. All
 Pinterest requests are proxied through server-side Next.js API routes. OAuth tokens
 are encrypted into a per-browser HTTP-only cookie and never exposed to the client.
 
@@ -32,7 +33,7 @@ Structured Design Intent
     ↓
 Query Generator
     ↓
-Pinterest List Pins (one live request)
+Pinterest List public boards, then List Pins on the selected board
     ↓
 Raw Candidates
     ↓
@@ -51,7 +52,7 @@ Final References
 
 - Browser sends search request to `/api/pinterest/search`.
 - Server decrypts the Pinterest session cookie.
-- Pipeline interprets the project brief, retrieves a page of the connected account's public Pins, deduplicates, scores, and ranks results locally.
+- Pipeline interprets the project brief, retrieves a page of public Pins from the board selected by the connected user, deduplicates, scores, and ranks results locally.
 - Results are returned as `SearchPipelineResult` and displayed in the UI.
 
 ## Optional developer project storage
@@ -63,7 +64,7 @@ does not call this store; its moodboard remains only in the open browser page.
 
 ## Limitations
 
-- Listing public Pins requires the read-only `boards:read` and `pins:read` scopes.
-- Global Pinterest discovery is not claimed; the public application uses Pins owned by the connected account.
+- Listing public boards and Pins on a selected board requires the read-only `boards:read` and `pins:read` scopes.
+- Global Pinterest discovery is not claimed; the public application uses public boards available to the connected account and Pins contained in the selected board.
 - The optional JSON project store is not suitable for Vercel production runtime.
 - AI visual analysis is planned as a future enhancement.

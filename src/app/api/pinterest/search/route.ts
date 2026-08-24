@@ -13,6 +13,7 @@ export const revalidate = 0;
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const searchParams = request.nextUrl.searchParams;
   const prompt = searchParams.get("q");
+  const boardId = searchParams.get("boardId");
   const mode = searchParams.get("mode") as
     | "inspiration"
     | "precision"
@@ -40,6 +41,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Missing query" }, { status: 400 });
   }
 
+  if (!boardId || !/^\d+$/.test(boardId)) {
+    return NextResponse.json(
+      { error: "Select a public Pinterest board before searching." },
+      { status: 400, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   if (prompt.length > 500) {
     return NextResponse.json({ error: "Query too long" }, { status: 400 });
   }
@@ -47,6 +55,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const result = await runSearchPipeline(session, {
       prompt: prompt.trim(),
+      boardId,
       mode: mode ?? "inspiration",
       limit: 30,
       maxQueries: 3,

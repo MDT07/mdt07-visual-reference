@@ -7,6 +7,8 @@ import {
   type PinterestSession,
 } from "./session";
 import type {
+  PinterestBoard,
+  PinterestBoardsResponse,
   PinterestPin,
   PinterestSearchResponse,
 } from "./types";
@@ -116,6 +118,108 @@ export async function listPinsAllPages(
 
   for (let page = 0; page < maxPages; page++) {
     const result = await listPins(activeSession, { pageSize, bookmark });
+    pins.push(...result.data.items);
+    activeSession = result.session;
+    refreshed = refreshed || result.refreshed;
+    bookmark = result.data.bookmark ?? undefined;
+    if (!bookmark) break;
+  }
+
+  return { pins, session: activeSession, refreshed };
+}
+
+export async function listPublicBoards(
+  session: PinterestSession,
+  options: { pageSize?: number; bookmark?: string } = {}
+): Promise<{
+  data: PinterestBoardsResponse;
+  session: PinterestSession;
+  refreshed: boolean;
+}> {
+  const active = await ensurePinterestSession(session);
+  const params = new URLSearchParams({
+    page_size: String(options.pageSize ?? 50),
+    privacy: "PUBLIC",
+  });
+  if (options.bookmark) params.set("bookmark", options.bookmark);
+
+  const data = await pinterestFetch<PinterestBoardsResponse>(
+    active.session,
+    `/boards?${params.toString()}`
+  );
+  return { data, session: active.session, refreshed: active.refreshed };
+}
+
+export async function listPublicBoardsAllPages(
+  session: PinterestSession,
+  options: { pageSize?: number; maxPages?: number } = {}
+): Promise<{
+  boards: PinterestBoard[];
+  session: PinterestSession;
+  refreshed: boolean;
+}> {
+  const pageSize = options.pageSize ?? 50;
+  const maxPages = options.maxPages ?? 2;
+  const boards: PinterestBoard[] = [];
+  let bookmark: string | undefined;
+  let activeSession = session;
+  let refreshed = false;
+
+  for (let page = 0; page < maxPages; page++) {
+    const result = await listPublicBoards(activeSession, { pageSize, bookmark });
+    boards.push(...result.data.items);
+    activeSession = result.session;
+    refreshed = refreshed || result.refreshed;
+    bookmark = result.data.bookmark ?? undefined;
+    if (!bookmark) break;
+  }
+
+  return { boards, session: activeSession, refreshed };
+}
+
+export async function listPinsOnBoard(
+  session: PinterestSession,
+  boardId: string,
+  options: { pageSize?: number; bookmark?: string } = {}
+): Promise<{
+  data: PinterestSearchResponse;
+  session: PinterestSession;
+  refreshed: boolean;
+}> {
+  const active = await ensurePinterestSession(session);
+  const params = new URLSearchParams({
+    page_size: String(options.pageSize ?? pinterestConfig.searchPageSize),
+  });
+  if (options.bookmark) params.set("bookmark", options.bookmark);
+
+  const data = await pinterestFetch<PinterestSearchResponse>(
+    active.session,
+    `/boards/${encodeURIComponent(boardId)}/pins?${params.toString()}`
+  );
+  return { data, session: active.session, refreshed: active.refreshed };
+}
+
+export async function listPinsOnBoardAllPages(
+  session: PinterestSession,
+  boardId: string,
+  options: { pageSize?: number; maxPages?: number } = {}
+): Promise<{
+  pins: PinterestPin[];
+  session: PinterestSession;
+  refreshed: boolean;
+}> {
+  const pageSize = options.pageSize ?? pinterestConfig.searchPageSize;
+  const maxPages = options.maxPages ?? 1;
+  const pins: PinterestPin[] = [];
+  let bookmark: string | undefined;
+  let activeSession = session;
+  let refreshed = false;
+
+  for (let page = 0; page < maxPages; page++) {
+    const result = await listPinsOnBoard(activeSession, boardId, {
+      pageSize,
+      bookmark,
+    });
     pins.push(...result.data.items);
     activeSession = result.session;
     refreshed = refreshed || result.refreshed;

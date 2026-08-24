@@ -26,6 +26,7 @@ export interface SearchStrategy {
 
 export interface SearchPipelineInput {
   prompt: string;
+  boardId?: string;
   mode?: SearchMode;
   limit?: number;
   maxQueries?: number;

@@ -56,13 +56,16 @@ export default function PrivacyPage() {
           </p>
           <h3>Pinterest content</h3>
           <p>
-            With the permission you approve, the Application may retrieve public Pins
-            owned by your connected Pinterest account. That data may include Pin
-            identifiers, titles, descriptions, images, source links, media details, and
-            a board owner username included with a Pin. Pinterest requires the read-only
-            <code>boards:read</code> and <code>pins:read</code> scopes to list these public
-            Pins. The Application does not request profile, secret-content, or write
-            scopes and does not retrieve secret boards or secret Pins.
+            With the permission you approve, the Application may list public boards
+            available to your connected Pinterest account, including public group boards
+            the account has joined, and retrieve public Pins from the board you select.
+            Board data may include an identifier, name, description, Pin count, and owner
+            username. Pin data may include identifiers, titles, descriptions, images,
+            source links, media details, and a board owner username included with a Pin.
+            Pinterest requires the read-only <code>boards:read</code> and
+            <code>pins:read</code> scopes for these operations. The Application does not
+            request profile, secret-content, or write scopes and does not retrieve secret
+            boards or secret Pins.
           </p>
           <h3>Session moodboard</h3>
           <p>
@@ -100,7 +103,7 @@ export default function PrivacyPage() {
           <h2>4. Why information is used</h2>
           <ul>
             <li>To authenticate authorized requests to the Pinterest API.</li>
-            <li>To retrieve and rank your public Pins for visual research.</li>
+            <li>To list available public boards and rank Pins from the board you select for visual research.</li>
             <li>To curate selected references into the Application’s moodboard.</li>
             <li>To link users back to original Pinterest sources.</li>
             <li>To enforce short-lived request limits and protect API access from abuse.</li>
