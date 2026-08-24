@@ -8,7 +8,7 @@ const siteUrl = (
 export const siteConfig = {
   name: "MDT07 Visual Reference",
   description:
-    "A project-scoped visual research workspace for web design and development, using transient Pinterest references with links to their original sources.",
+    "A project-scoped visual research workspace that ranks public Pins from a connected Pinterest account and links to their original sources.",
   contactEmail: "emirsemenov@yahoo.com",
   githubUrl: "https://github.com/MDT07",
   githubUsername: "MDT07",
@@ -30,7 +30,7 @@ export const pinterestConfig = {
   sessionSecret: process.env.PINTEREST_SESSION_SECRET ?? "",
   apiBase: process.env.PINTEREST_API_BASE ?? "https://api.pinterest.com/v5",
   searchPageSize: Number(process.env.PINTEREST_SEARCH_PAGE_SIZE ?? 25),
-  scopes: ["pins:read"] as const,
+  scopes: ["boards:read", "pins:read"] as const,
 } as const;
 
 export const agentApiConfig = {

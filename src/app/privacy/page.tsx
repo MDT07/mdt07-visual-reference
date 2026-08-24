@@ -57,11 +57,12 @@ export default function PrivacyPage() {
           <h3>Pinterest content</h3>
           <p>
             With the permission you approve, the Application may retrieve public Pins
-            that Pinterest makes available through its API. That data may include Pin
+            owned by your connected Pinterest account. That data may include Pin
             identifiers, titles, descriptions, images, source links, media details, and
-            a board owner username included with a Pin. The current implementation
-            requests only the read-only <code>pins:read</code> scope and does not request
-            profile, board, secret-content, or write scopes.
+            a board owner username included with a Pin. Pinterest requires the read-only
+            <code>boards:read</code> and <code>pins:read</code> scopes to list these public
+            Pins. The Application does not request profile, secret-content, or write
+            scopes and does not retrieve secret boards or secret Pins.
           </p>
           <h3>Session moodboard</h3>
           <p>
@@ -90,8 +91,8 @@ export default function PrivacyPage() {
           </p>
           <p>
             You can decline authorization or later revoke the Application’s access in
-            your Pinterest account settings. Revocation may prevent Pinterest search,
-            search or other connected features from working.
+            your Pinterest account settings. Revocation prevents connected Pin retrieval
+            and related reference features from working.
           </p>
         </section>
 
@@ -99,7 +100,7 @@ export default function PrivacyPage() {
           <h2>4. Why information is used</h2>
           <ul>
             <li>To authenticate authorized requests to the Pinterest API.</li>
-            <li>To search and display relevant Pins for visual research.</li>
+            <li>To retrieve and rank your public Pins for visual research.</li>
             <li>To curate selected references into the Application’s moodboard.</li>
             <li>To link users back to original Pinterest sources.</li>
             <li>To enforce short-lived request limits and protect API access from abuse.</li>
@@ -124,7 +125,7 @@ export default function PrivacyPage() {
             lifetime and is replaced when Pinterest refreshes authorization.
           </p>
           <p>
-            Pinterest search responses are returned with instructions not to cache and
+            Pinterest API responses are returned with instructions not to cache and
             are kept only in the memory of the open page. Pinterest images are loaded
             from their original remote source without the Application’s image optimization
             cache. The developer-only Agent API and its local project store are disabled

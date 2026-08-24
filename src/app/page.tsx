@@ -47,7 +47,8 @@ export default async function HomePage() {
             </h1>
             <p className="max-w-3xl text-lg leading-8 text-text-secondary md:text-xl">
               A project-scoped workspace for discovering and comparing visual
-              references while planning an original website or interface.
+              references from your public Pinterest Pins while planning an original
+              website or interface.
             </p>
           </div>
           <div className="rounded-2xl border border-surface-2 bg-surface-1 p-6">
@@ -73,7 +74,7 @@ export default async function HomePage() {
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">02</p>
             <h2 className="text-xl font-semibold text-text-primary">Explore sources</h2>
             <p className="leading-7 text-text-secondary">
-              Explore relevant results provided through the Pinterest API. Every
+              Explore public Pins owned by your connected Pinterest account. Every
               reference links back to its original source on Pinterest.
             </p>
           </div>
@@ -106,7 +107,7 @@ export default async function HomePage() {
                 Reference workspace
               </p>
               <h2 className="text-3xl font-semibold tracking-tight text-text-primary">
-                Search Pinterest references
+                Search your Pinterest references
               </h2>
             </div>
             {connected ? (
@@ -140,14 +141,14 @@ export default async function HomePage() {
             presets={PRESETS}
             isAvailable={connected}
             labels={{
-              placeholder: "Enter a query...",
+              placeholder: "Describe the visual direction...",
               button: "Search",
               save: "Save to moodboard",
               saved: "Saved",
               loadMore: "Load more",
               noResults: "No results found",
               initial: connected
-                ? "Search results will appear here."
+                ? "Your public Pinterest Pins will appear here after a search."
                 : "Search becomes available after Pinterest access is connected.",
             }}
             moodboardLabels={{

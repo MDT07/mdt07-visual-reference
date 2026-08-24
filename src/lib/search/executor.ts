@@ -1,6 +1,6 @@
 import "server-only";
 
-import { searchPinsAllPages } from "@/lib/pinterest/client";
+import { listPinsAllPages } from "@/lib/pinterest/client";
 import type { PinterestSession } from "@/lib/pinterest/session";
 import type { PinterestPin } from "@/lib/pinterest/types";
 import type { SearchStrategy } from "./types";
@@ -14,19 +14,19 @@ export async function executeSearchStrategies(
   session: PinterestSession;
   refreshed: boolean;
 }> {
-  let activeSession = session;
-  let refreshed = false;
-  const results: { strategy: SearchStrategy; pins: PinterestPin[] }[] = [];
-
-  for (const strategy of strategies) {
-    const res = await searchPinsAllPages(activeSession, strategy.query, {
-      pageSize: options.pageSize,
-      maxPages: options.maxPagesPerQuery,
-    });
-    activeSession = res.session;
-    refreshed = refreshed || res.refreshed;
-    results.push({ strategy, pins: res.pins });
+  const primaryStrategy = strategies[0];
+  if (!primaryStrategy) {
+    return { results: [], session, refreshed: false };
   }
 
-  return { results, session: activeSession, refreshed };
+  const res = await listPinsAllPages(session, {
+    pageSize: options.pageSize,
+    maxPages: options.maxPagesPerQuery,
+  });
+
+  return {
+    results: [{ strategy: primaryStrategy, pins: res.pins }],
+    session: res.session,
+    refreshed: res.refreshed,
+  };
 }

@@ -103,7 +103,7 @@ export default function ReferencesSearchShell({
               {pipelineMeta.brief.style.join(", ") || "—"} /{" "}
               {pipelineMeta.brief.mood.join(", ") || "—"}
             </p>
-            <p className="font-medium">Queries used:</p>
+            <p className="font-medium">Interpretation strategies:</p>
             <ul className="list-disc space-y-1 pl-5">
               {pipelineMeta.strategies.map((strategy) => (
                 <li key={strategy.query}>

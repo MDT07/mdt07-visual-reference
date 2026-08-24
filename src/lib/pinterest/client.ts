@@ -76,9 +76,8 @@ async function pinterestFetch<T>(
   return res.json();
 }
 
-export async function searchPins(
+export async function listPins(
   session: PinterestSession,
-  query: string,
   options: { pageSize?: number; bookmark?: string } = {}
 ): Promise<{
   data: PinterestSearchResponse;
@@ -87,7 +86,6 @@ export async function searchPins(
 }> {
   const active = await ensurePinterestSession(session);
   const params = new URLSearchParams({
-    q: query,
     page_size: String(options.pageSize ?? pinterestConfig.searchPageSize),
   });
   if (options.bookmark) {
@@ -96,14 +94,13 @@ export async function searchPins(
 
   const data = await pinterestFetch<PinterestSearchResponse>(
     active.session,
-    `/search/pins?${params.toString()}`
+    `/pins?${params.toString()}`
   );
   return { data, session: active.session, refreshed: active.refreshed };
 }
 
-export async function searchPinsAllPages(
+export async function listPinsAllPages(
   session: PinterestSession,
-  query: string,
   options: { pageSize?: number; maxPages?: number } = {}
 ): Promise<{
   pins: PinterestPin[];
@@ -118,7 +115,7 @@ export async function searchPinsAllPages(
   let refreshed = false;
 
   for (let page = 0; page < maxPages; page++) {
-    const result = await searchPins(activeSession, query, { pageSize, bookmark });
+    const result = await listPins(activeSession, { pageSize, bookmark });
     pins.push(...result.data.items);
     activeSession = result.session;
     refreshed = refreshed || result.refreshed;

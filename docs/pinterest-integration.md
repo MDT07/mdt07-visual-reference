@@ -2,7 +2,11 @@
 
 ## Overview
 
-MDT07 Visual Reference uses the official Pinterest API v5 with read-only access (`pins:read`). All Pinterest requests are proxied through server-side Next.js API routes. OAuth tokens are encrypted into a per-browser HTTP-only cookie and never exposed to the client.
+MDT07 Visual Reference uses the official Pinterest API v5 with read-only access
+(`boards:read` and `pins:read`). It retrieves public Pins owned by the connected
+Pinterest account and ranks them locally against the user's project brief. All
+Pinterest requests are proxied through server-side Next.js API routes. OAuth tokens
+are encrypted into a per-browser HTTP-only cookie and never exposed to the client.
 
 ## Environment variables
 
@@ -28,7 +32,7 @@ Structured Design Intent
     ↓
 Query Generator
     ↓
-Multi-query Pinterest Search
+Pinterest List Pins (one live request)
     ↓
 Raw Candidates
     ↓
@@ -47,7 +51,7 @@ Final References
 
 - Browser sends search request to `/api/pinterest/search`.
 - Server decrypts the Pinterest session cookie.
-- Pipeline generates multiple Pinterest queries, fetches pages, merges, deduplicates, scores, and ranks results.
+- Pipeline interprets the project brief, retrieves a page of the connected account's public Pins, deduplicates, scores, and ranks results locally.
 - Results are returned as `SearchPipelineResult` and displayed in the UI.
 
 ## Optional developer project storage
@@ -59,6 +63,7 @@ does not call this store; its moodboard remains only in the open browser page.
 
 ## Limitations
 
-- Pinterest Trial Access allows only `pins:read`.
+- Listing public Pins requires the read-only `boards:read` and `pins:read` scopes.
+- Global Pinterest discovery is not claimed; the public application uses Pins owned by the connected account.
 - The optional JSON project store is not suitable for Vercel production runtime.
 - AI visual analysis is planned as a future enhancement.

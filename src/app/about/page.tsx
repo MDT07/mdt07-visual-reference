@@ -25,7 +25,7 @@ const workflow = [
   {
     number: "02",
     title: "Find relevant references",
-    text: "The application uses Pinterest data to help surface relevant Pins for focused visual research.",
+    text: "The application retrieves public Pins owned by your connected Pinterest account and ranks them against the project brief.",
   },
   {
     number: "03",
