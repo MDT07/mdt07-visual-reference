@@ -1,18 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { siteConfig } from "@/lib/config";
+import { requireOwnerApi } from "@/lib/auth/authorization";
+import { getAppUrl } from "@/lib/deployment";
 import { clearPinterestSession } from "@/lib/pinterest/session";
+import { hasValidMutationOrigin } from "@/lib/security/request";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const origin = request.headers.get("origin");
-  if (origin && origin !== siteConfig.url) {
+  const accessError = await requireOwnerApi();
+  if (accessError) return accessError;
+
+  if (!hasValidMutationOrigin(request)) {
     return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
   }
 
-  const redirectUrl = new URL("/", siteConfig.url);
+  const redirectUrl = new URL(getAppUrl("/studio"));
   redirectUrl.searchParams.set("oauth", "disconnected");
   const response = NextResponse.redirect(redirectUrl, 303);
+  response.headers.set("Cache-Control", "no-store, max-age=0");
   clearPinterestSession(response);
   return response;
 }

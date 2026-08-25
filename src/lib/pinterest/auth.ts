@@ -46,12 +46,8 @@ export async function exchangeCode(code: string): Promise<PinterestTokenResponse
   });
 
   if (!res.ok) {
-    const err = (await res.json().catch(() => ({}))) as {
-      message?: string;
-      detail?: string;
-    };
     throw new Error(
-      `Pinterest token exchange failed: ${res.status} ${err.message ?? err.detail ?? JSON.stringify(err)}`
+      `Pinterest token exchange failed with status ${res.status}.`
     );
   }
 
@@ -76,13 +72,7 @@ export async function refreshAccessToken(
   });
 
   if (!res.ok) {
-    const err = (await res.json().catch(() => ({}))) as {
-      message?: string;
-      detail?: string;
-    };
-    throw new Error(
-      `Pinterest refresh failed: ${res.status} ${err.message ?? err.detail ?? JSON.stringify(err)}`
-    );
+    throw new Error(`Pinterest refresh failed with status ${res.status}.`);
   }
 
   return res.json();

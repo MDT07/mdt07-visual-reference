@@ -6,10 +6,19 @@ import {
   setPinterestSession,
 } from "@/lib/pinterest/session";
 import { checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
+import { requireOwnerApi } from "@/lib/auth/authorization";
+import { hasValidMutationOrigin } from "@/lib/security/request";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  const accessError = await requireOwnerApi();
+  if (accessError) return accessError;
+
+  if (!hasValidMutationOrigin(request)) {
+    return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
+  }
+
   const session = getPinterestSessionFromRequest(request);
   if (!session) {
     return NextResponse.json(

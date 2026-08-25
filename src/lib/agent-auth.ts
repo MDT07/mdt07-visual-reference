@@ -4,6 +4,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { agentApiConfig } from "@/lib/config";
+import { requireOwnerApi } from "@/lib/auth/authorization";
 
 function keysMatch(provided: string, expected: string): boolean {
   const providedBuffer = Buffer.from(provided, "utf8");
@@ -14,12 +15,15 @@ function keysMatch(provided: string, expected: string): boolean {
   );
 }
 
-export function requireAgentApiAuth(
+export async function requireAgentApiAuth(
   request: NextRequest
-): NextResponse | null {
+): Promise<NextResponse | null> {
   if (!agentApiConfig.enabled) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+
+  const ownerError = await requireOwnerApi();
+  if (ownerError) return ownerError;
 
   if (!agentApiConfig.apiKey) {
     return NextResponse.json(

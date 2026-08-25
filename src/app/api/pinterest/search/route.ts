@@ -6,11 +6,15 @@ import {
   getPinterestSessionFromRequest,
 } from "@/lib/pinterest/session";
 import { checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
+import { requireOwnerApi } from "@/lib/auth/authorization";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const accessError = await requireOwnerApi();
+  if (accessError) return accessError;
+
   const searchParams = request.nextUrl.searchParams;
   const prompt = searchParams.get("q");
   const boardId = searchParams.get("boardId");

@@ -9,7 +9,7 @@ import type { SearchMode } from "@/lib/search/types";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const authError = requireAgentApiAuth(request);
+  const authError = await requireAgentApiAuth(request);
   if (authError) return authError;
 
   const session = getPinterestSessionFromRequest(request);
