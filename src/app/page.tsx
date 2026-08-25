@@ -114,7 +114,7 @@ export default async function HomePage() {
             {connected ? (
               <div className="flex flex-wrap items-center gap-3">
                 <span className="inline-flex w-fit rounded-full border border-green-300 bg-green-50 px-4 py-2 text-xs text-green-800">
-                  Pinterest access is connected for this session
+                  Connected via Pinterest OAuth — read-only access
                 </span>
                 <form action="/api/pinterest/auth/disconnect" method="post">
                   <button
@@ -130,7 +130,7 @@ export default async function HomePage() {
                 href="/api/pinterest/auth"
                 className="inline-flex w-fit rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover"
               >
-                Connect Pinterest
+                Connect with Pinterest OAuth
               </a>
             ) : (
               <span className="inline-flex w-fit rounded-full border border-surface-3 px-4 py-2 text-xs text-text-tertiary">

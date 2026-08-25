@@ -166,6 +166,16 @@ export default function ReferencesSearchShell({
           <p className="text-xs leading-5 text-text-tertiary">
             Only public boards returned by Pinterest are shown. Secret boards and secret Pins are not requested.
           </p>
+          {!boardsLoading && !boardsError && boards.length > 0 && (
+            <p
+              className="rounded-md border border-green-300 bg-green-50 px-3 py-2 text-xs leading-5 text-green-800"
+              role="status"
+            >
+              Live Pinterest API response: {boards.length} public{" "}
+              {boards.length === 1 ? "board" : "boards"} loaded now. This
+              response is not cached.
+            </p>
+          )}
           {boardsError && <p className="text-sm text-red-600">{boardsError}</p>}
           {!boardsLoading && !boardsError && boards.length === 0 && (
             <p className="rounded-md border border-surface-3 bg-surface-1 p-3 text-sm leading-6 text-text-secondary">
@@ -187,35 +197,42 @@ export default function ReferencesSearchShell({
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {pipelineMeta && (
-        <details className="rounded-lg border border-surface-3 bg-surface-1 p-4 text-sm text-text-secondary">
-          <summary className="cursor-pointer font-medium text-text-primary">
-            Search pipeline ({pipelineMeta.candidates} candidates,{" "}
-            {pipelineMeta.duplicatesRemoved} duplicates removed)
-          </summary>
-          <div className="mt-3 space-y-2">
-            <p>
-              <span className="font-medium">Source board:</span>{" "}
-              {pipelineMeta.boardName}
-            </p>
-            <p>
-              <span className="font-medium">Parsed brief:</span>{" "}
-              {pipelineMeta.brief.industry || "—"} /{" "}
-              {pipelineMeta.brief.style.join(", ") || "—"} /{" "}
-              {pipelineMeta.brief.mood.join(", ") || "—"}
-            </p>
-            <p className="font-medium">Interpretation strategies:</p>
-            <ul className="list-disc space-y-1 pl-5">
-              {pipelineMeta.strategies.map((strategy) => (
-                <li key={strategy.query}>
-                  {strategy.query}{" "}
-                  <span className="text-text-tertiary">
-                    (weight {strategy.weight}, {strategy.intent})
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </details>
+        <div className="space-y-3" aria-live="polite">
+          <p className="rounded-md border border-green-300 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
+            Live Pinterest API response: {pipelineMeta.candidates} public Pins
+            retrieved from {pipelineMeta.boardName} and ranked locally for this
+            project brief. Results are not cached.
+          </p>
+          <details className="rounded-lg border border-surface-3 bg-surface-1 p-4 text-sm text-text-secondary">
+            <summary className="cursor-pointer font-medium text-text-primary">
+              Search pipeline ({pipelineMeta.candidates} candidates,{" "}
+              {pipelineMeta.duplicatesRemoved} duplicates removed)
+            </summary>
+            <div className="mt-3 space-y-2">
+              <p>
+                <span className="font-medium">Source board:</span>{" "}
+                {pipelineMeta.boardName}
+              </p>
+              <p>
+                <span className="font-medium">Parsed brief:</span>{" "}
+                {pipelineMeta.brief.industry || "—"} /{" "}
+                {pipelineMeta.brief.style.join(", ") || "—"} /{" "}
+                {pipelineMeta.brief.mood.join(", ") || "—"}
+              </p>
+              <p className="font-medium">Interpretation strategies:</p>
+              <ul className="list-disc space-y-1 pl-5">
+                {pipelineMeta.strategies.map((strategy) => (
+                  <li key={strategy.query}>
+                    {strategy.query}{" "}
+                    <span className="text-text-tertiary">
+                      (weight {strategy.weight}, {strategy.intent})
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </details>
+        </div>
       )}
 
       {items.length === 0 ? (

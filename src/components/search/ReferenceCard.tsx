@@ -52,7 +52,7 @@ export default function ReferenceCard({ reference, footer }: ReferenceCardProps)
             rel="noopener noreferrer"
             className="text-xs text-accent hover:underline"
           >
-            Open on Pinterest
+            Open original Pin on Pinterest
           </a>
           {typeof reference.finalScore === "number" && (
             <span className="text-xs text-text-tertiary">

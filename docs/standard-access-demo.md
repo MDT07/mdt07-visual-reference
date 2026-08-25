@@ -26,24 +26,24 @@ Before recording, prepare a Pinterest Business test account with:
 Create or save the demo Pins directly in Pinterest. The application itself should keep
 requesting only `boards:read` and `pins:read`.
 
-## Recording plan (about 2 minutes)
+## Recording plan (one continuous take, about 80–100 seconds)
 
 | Time | On screen | Optional English voiceover |
 | --- | --- | --- |
-| 0:00–0:15 | Production home page and product explanation | “MDT07 Visual Reference is a project-scoped research workspace for web designers and developers.” |
-| 0:15–0:35 | Click **Connect Pinterest** and show the Pinterest consent screen | “The user connects their own Pinterest account through OAuth. The app requests only read access to public boards and public Pins.” |
-| 0:35–0:48 | Approve access and return to the connected workspace | “The authorization code is exchanged server-side. Tokens are kept in an encrypted, HTTP-only browser session.” |
-| 0:48–1:02 | Open the **Public Pinterest board** selector and choose the prepared board | “The app lists public boards available to the connected account. Secret content is not requested.” |
-| 1:02–1:25 | Enter `editorial architecture portfolio, monochrome, asymmetric layout` and click **Search** | “The server retrieves live public Pins from the selected board. The project brief is parsed and the results are ranked locally.” |
-| 1:25–1:42 | Scroll through real results and expand **Search pipeline** | “The ranking helps the user compare relevant visual directions without copying or taking ownership of Pinterest content.” |
-| 1:42–1:55 | Click **Open original** on one result and briefly show its Pinterest source | “Every reference links back to the original Pin on Pinterest.” |
-| 1:55–2:10 | Return and click **Save to moodboard** on two results | “Selected references are compared in a temporary session moodboard and are not persisted by the application.” |
-| 2:10–2:20 | Show **Disconnect** and the footer links to Privacy and Terms | “The user can disconnect at any time. Public Privacy Policy, Terms, and contact information are available on the same production domain.” |
+| 0:00–0:08 | Production URL, disconnected workspace, and **Connect with Pinterest OAuth** | “MDT07 Visual Reference uses Pinterest OAuth and the Pinterest API to research public visual references for one web project.” |
+| 0:08–0:22 | Click **Connect with Pinterest OAuth**; keep the Pinterest authorization URL, app name, and requested permissions visible | “The user authorizes only read access to public boards and public Pins.” |
+| 0:22–0:32 | Click **Give access** and show the uninterrupted return to the production callback and connected workspace | “Pinterest returns an authorization code. The server exchanges it for a token and keeps credentials outside the browser UI.” |
+| 0:32–0:44 | Show the **Live Pinterest API response** board count and choose `Web Design References` | “The app now retrieves the connected account’s public boards from the Pinterest API. Secret content is not requested.” |
+| 0:44–0:58 | Enter `editorial architecture portfolio, monochrome, asymmetric layout` and click **Search** | “The server retrieves public Pins from the selected board and ranks their metadata locally against the project brief.” |
+| 0:58–1:10 | Show the live Pin count, results, Pinterest attribution, and expand **Search pipeline** | “The displayed Pins came from this live Pinterest API request and are not cached.” |
+| 1:10–1:20 | Click **Open original Pin on Pinterest** and show the matching Pinterest Pin page | “Every result links back to its original Pin on Pinterest.” |
+| 1:20–1:32 | Return without stopping the recording; save two results and show the temporary moodboard | “Selections stay only in the open page and are not persisted.” |
 
 ## Recording checklist
 
 - Record the real production host: `https://mdt07-visual-reference.vercel.app`.
 - Use a fresh OAuth authorization so the Pinterest consent screen is visible.
+- Record Connect → consent → Give access → callback → API action in one uninterrupted take. Do not replace any part with screenshots or slides.
 - Keep the address bar visible for the production site and callback return.
 - Do not show the App Secret, access token, Vercel environment values, developer console,
   personal messages, or unrelated browser tabs.
