@@ -3,16 +3,24 @@
 The approved public deployment must remain unchanged until the private preview
 passes all checks.
 
-## Current status — August 25, 2026
+## Current status — August 27, 2026
 
 - Created Vercel project `mdt07-reference-studio`.
-- Deployed a secret-free Studio scaffold at
-  `https://mdt07-reference-studio.vercel.app`.
-- Confirmed Studio/Admin redirect to owner login, connected APIs fail closed, Agent
-  API returns 404, and the host disallows indexing.
-- GitHub OAuth credentials and Pinterest credentials are not installed on this new
-  project yet, so connected functionality cannot start.
-- The existing public production and Pinterest Redirect URI remain unchanged.
+- Deployed the Studio at `https://mdt07-reference-studio.vercel.app`.
+- Created a GitHub OAuth App with the exact private callback, installed a single
+  working Client Secret, and verified the immutable-ID owner session.
+- Installed the existing Pinterest server credentials without exposing an access
+  token, added the exact private callback, and kept the old public callback for
+  rollback.
+- Completed a fresh live Pinterest OAuth flow using only `boards:read` and
+  `pins:read`.
+- Verified two public boards, retrieval and local ranking of 15 Pins from the selected
+  board, the session-only moodboard, connected Admin status, and an error-free browser
+  console.
+- Confirmed unauthenticated Studio/Admin redirects, 403 Pinterest APIs, 404 Agent API,
+  and full-host `robots.txt` exclusion.
+- The existing public production remains unchanged until the reviewed branch is
+  merged and the public cutover checks below pass.
 
 ## Preparation
 

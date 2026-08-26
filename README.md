@@ -26,11 +26,11 @@ Current verified public identity:
 - Repository: `https://github.com/MDT07/mdt07-visual-reference`
 - Public website: `https://mdt07-visual-reference.vercel.app/`
 - Privacy Policy: `https://mdt07-visual-reference.vercel.app/privacy`
-- Private Studio scaffold: `https://mdt07-reference-studio.vercel.app/`
+- Private Studio: `https://mdt07-reference-studio.vercel.app/`
 
-The private hostname now exists, but connected features remain intentionally
-unconfigured until GitHub owner OAuth is installed and verified. Do not move the
-Pinterest Redirect URI to this host before that authentication gate passes.
+GitHub owner authentication and the read-only Pinterest OAuth flow were verified on
+the private host on August 27, 2026. The public host remains the product and legal
+website; connected functionality belongs only on the private Studio deployment.
 
 ## Features
 
@@ -164,7 +164,8 @@ configured for npm and GitHub Actions updates.
 - The optional JSON project store is local-development-only and unsuitable for Vercel.
 - AI visual analysis and Pinterest write operations are not implemented or claimed.
 - Credential rotation is intentionally deferred during the active integration phase;
-  rotate all previously handled credentials before final private production cutover.
+  rotate all previously handled credentials before expanding access beyond the owner
+  or treating the security milestone as complete.
 
 ## Contact
 

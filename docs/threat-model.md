@@ -37,4 +37,5 @@
   vault milestone.
 - Credentials have not yet been rotated at the owner's instruction.
 
-These risks block final private production cutover, not local implementation.
+The owner has accepted these risks temporarily for the working private Studio. They
+block expansion beyond the single-owner model and completion of the security milestone.
