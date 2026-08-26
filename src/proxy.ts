@@ -27,7 +27,9 @@ const authenticatedOwnerProxy = auth((request) => {
 
 export default function proxy(request: NextRequest, event: NextFetchEvent) {
   if (!deploymentConfig.isStudio) {
-    return NextResponse.rewrite(new URL("/_not-found", request.url));
+    return NextResponse.rewrite(new URL("/_not-found", request.url), {
+      status: 404,
+    });
   }
 
   if (!isOwnerAuthConfigured()) {
