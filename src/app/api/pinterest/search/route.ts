@@ -6,11 +6,15 @@ import {
   getPinterestSessionFromRequest,
 } from "@/lib/pinterest/session";
 import { checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
+import { requireOwnerApi } from "@/lib/auth/authorization";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const accessError = await requireOwnerApi();
+  if (accessError) return accessError;
+
   const searchParams = request.nextUrl.searchParams;
   const prompt = searchParams.get("q");
   const boardId = searchParams.get("boardId");
@@ -33,12 +37,21 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Search limit reached. Try again shortly." },
-      { status: 429, headers: rateLimitHeaders(rateLimit) }
+      {
+        status: 429,
+        headers: {
+          ...rateLimitHeaders(rateLimit),
+          "Cache-Control": "no-store",
+        },
+      }
     );
   }
 
   if (!prompt || prompt.trim().length === 0) {
-    return NextResponse.json({ error: "Missing query" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing query" },
+      { status: 400, headers: { "Cache-Control": "no-store" } }
+    );
   }
 
   if (!boardId || !/^\d+$/.test(boardId)) {
@@ -49,7 +62,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   if (prompt.length > 500) {
-    return NextResponse.json({ error: "Query too long" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Query too long" },
+      { status: 400, headers: { "Cache-Control": "no-store" } }
+    );
   }
 
   try {

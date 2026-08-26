@@ -10,7 +10,7 @@ import type { VisualReference } from "@/lib/pinterest/types";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const authError = requireAgentApiAuth(request);
+  const authError = await requireAgentApiAuth(request);
   if (authError) return authError;
 
   const body = (await request.json().catch(() => ({}))) as {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 }
 
 export async function DELETE(request: NextRequest): Promise<NextResponse> {
-  const authError = requireAgentApiAuth(request);
+  const authError = await requireAgentApiAuth(request);
   if (authError) return authError;
 
   const body = (await request.json().catch(() => ({}))) as {

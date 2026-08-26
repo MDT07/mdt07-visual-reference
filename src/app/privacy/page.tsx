@@ -26,7 +26,7 @@ export default function PrivacyPage() {
       />
 
       <div className="legal-content py-12">
-        <p><strong>Last updated:</strong> August 24, 2026</p>
+        <p><strong>Last updated:</strong> August 25, 2026</p>
 
         <section>
           <h2>1. Scope of this policy</h2>
@@ -38,8 +38,10 @@ export default function PrivacyPage() {
             endorsed by or affiliated with Pinterest.
           </p>
           <p>
-            The current Application does not provide its own user account registration
-            system and does not sell personal information.
+            The public website does not offer open account registration. Connected
+            Pinterest functionality is separated into a private studio that authenticates
+            its configured owner through GitHub. The Application does not sell personal
+            information.
           </p>
         </section>
 
@@ -53,6 +55,15 @@ export default function PrivacyPage() {
             supplies one, a refresh token. It also processes the permissions associated
             with those tokens. Pinterest credentials and tokens are not intentionally
             exposed to browser code.
+          </p>
+          <h3>Private studio authentication</h3>
+          <p>
+            The private studio may receive the configured owner&apos;s GitHub numeric
+            account identifier, display name, email address when GitHub makes it
+            available, and profile image for authentication and authorization. Access
+            is allowed only when the GitHub identifier matches the server-side owner
+            allowlist. The Application does not receive or store the owner&apos;s GitHub
+            password.
           </p>
           <h3>Pinterest content</h3>
           <p>
@@ -103,6 +114,7 @@ export default function PrivacyPage() {
           <h2>4. Why information is used</h2>
           <ul>
             <li>To authenticate authorized requests to the Pinterest API.</li>
+            <li>To authenticate and authorize the configured private-studio owner.</li>
             <li>To list available public boards and rank Pins from the board you select for visual research.</li>
             <li>To curate selected references into the Application’s moodboard.</li>
             <li>To link users back to original Pinterest sources.</li>
@@ -128,6 +140,12 @@ export default function PrivacyPage() {
             lifetime and is replaced when Pinterest refreshes authorization.
           </p>
           <p>
+            Private-studio authentication currently uses an encrypted application
+            session cookie. The Application does not currently maintain a public user
+            directory or accept self-service registrations. Its developer-only local
+            project store remains disabled on the public production website.
+          </p>
+          <p>
             Pinterest API responses are returned with instructions not to cache and
             are kept only in the memory of the open page. Pinterest images are loaded
             from their original remote source without the Application’s image optimization
@@ -144,7 +162,9 @@ export default function PrivacyPage() {
         <section>
           <h2>6. Cookies and browser storage</h2>
           <p>
-            The Application uses an essential, short-lived, HTTP-only cookie during
+            The private studio uses an essential HTTP-only application session cookie
+            after GitHub authentication. The Application also uses a short-lived,
+            HTTP-only cookie during
             Pinterest OAuth to verify the state parameter. If authorization succeeds, it
             uses a separate encrypted HTTP-only cookie to isolate that browser’s Pinterest
             tokens and connection state. It does not currently use local storage,
@@ -168,7 +188,8 @@ export default function PrivacyPage() {
         <section>
           <h2>8. Third-party services</h2>
           <p>
-            Pinterest supplies the content and OAuth/API services used by the
+            GitHub supplies the owner authentication service used by the private
+            studio. Pinterest supplies the content and OAuth/API services used by the
             Application. Pinterest processes information under its own terms and privacy
             policy. The production website is currently hosted on Vercel, whose systems
             may process technical request data needed to deliver the service. If you
@@ -190,8 +211,8 @@ export default function PrivacyPage() {
             authorization through Pinterest.
           </p>
           <p>
-            Use the Disconnect control on the home page to delete the encrypted token
-            cookie from this browser. You can also revoke the Application in Pinterest
+            Use the Disconnect control or sign out of the private studio to delete the
+            encrypted token cookie from this browser. You can also revoke the Application in Pinterest
             account settings. Because the Application does not maintain a user-token
             database, it generally has no separate token record to locate after the
             cookie is removed. For questions or a request concerning other information,

@@ -1,9 +1,7 @@
-import { getPublicUrl, isPinterestConfigured } from "@/lib/config";
-import { getPinterestSessionFromCookies } from "@/lib/pinterest/session";
-import ReferencesSearchShell from "@/components/pinterest/ReferencesSearchShell";
+import Link from "next/link";
 import type { Metadata } from "next";
-
-export const dynamic = "force-dynamic";
+import { getPublicUrl, siteConfig } from "@/lib/config";
+import { deploymentConfig } from "@/lib/deployment";
 
 export const metadata: Metadata = {
   description:
@@ -17,23 +15,7 @@ export const metadata: Metadata = {
   },
 };
 
-const PRESETS = [
-  "fashion editorial",
-  "architecture",
-  "luxury interior",
-  "minimalist design",
-  "creative studio",
-  "automotive",
-  "product photography",
-  "art direction",
-  "brutalist web design",
-  "luxury brand",
-];
-
-export default async function HomePage() {
-  const configured = isPinterestConfigured();
-  const connected = configured && Boolean(await getPinterestSessionFromCookies());
-
+export default function HomePage() {
   return (
     <main>
       <section className="border-b border-surface-2 bg-surface-0">
@@ -100,64 +82,39 @@ export default async function HomePage() {
         </p>
       </section>
 
-      <section id="workspace" className="border-y border-surface-2 bg-surface-0">
-        <div className="mx-auto max-w-6xl px-4 py-16">
-          <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-            <div className="space-y-2">
-              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand">
-                Reference workspace
-              </p>
-              <h2 className="text-3xl font-semibold tracking-tight text-text-primary">
-                Search your Pinterest references
-              </h2>
-            </div>
-            {connected ? (
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="inline-flex w-fit rounded-full border border-green-300 bg-green-50 px-4 py-2 text-xs text-green-800">
-                  Connected via Pinterest OAuth — read-only access
-                </span>
-                <form action="/api/pinterest/auth/disconnect" method="post">
-                  <button
-                    type="submit"
-                    className="text-xs text-text-secondary underline-offset-4 hover:underline"
-                  >
-                    Disconnect
-                  </button>
-                </form>
-              </div>
-            ) : configured ? (
-              <a
-                href="/api/pinterest/auth"
-                className="inline-flex w-fit rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover"
-              >
-                Connect with Pinterest OAuth
-              </a>
-            ) : (
-              <span className="inline-flex w-fit rounded-full border border-surface-3 px-4 py-2 text-xs text-text-tertiary">
-                Pinterest API access is pending configuration
-              </span>
-            )}
+      <section className="border-y border-surface-2 bg-surface-0">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand">
+              Access model
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-text-primary">
+              Public information, private connected workspace
+            </h2>
+            <p className="mt-4 max-w-3xl leading-7 text-text-secondary">
+              The public website explains the project and keeps its legal pages openly
+              available. Pinterest OAuth, tokens, and connected research tools are
+              isolated to an owner-authorized studio deployment.
+            </p>
           </div>
-          <ReferencesSearchShell
-            presets={PRESETS}
-            isAvailable={connected}
-            labels={{
-              placeholder: "Describe the visual direction...",
-              button: "Search",
-              save: "Save to moodboard",
-              saved: "Saved",
-              loadMore: "Load more",
-              noResults: "No results found",
-              initial: connected
-                ? "Choose a public board, then describe the direction you want to explore."
-                : "Search becomes available after Pinterest access is connected.",
-            }}
-            moodboardLabels={{
-              attribution: "Pinterest",
-              originalPin: "Open original",
-              empty: "No references selected in this session yet.",
-            }}
-          />
+          <div className="flex flex-wrap gap-3">
+            {deploymentConfig.isStudio && (
+              <Link
+                href="/studio"
+                className="inline-flex rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white hover:bg-brand-hover"
+              >
+                Open owner studio
+              </Link>
+            )}
+            <a
+              href={`${siteConfig.githubUrl}/mdt07-visual-reference`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex rounded-full border border-surface-3 px-5 py-3 text-sm font-semibold text-text-primary hover:border-brand hover:text-brand"
+            >
+              View source on GitHub
+            </a>
+          </div>
         </div>
       </section>
 

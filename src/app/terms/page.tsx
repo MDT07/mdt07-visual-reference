@@ -26,7 +26,7 @@ export default function TermsPage() {
       />
 
       <div className="legal-content py-12">
-        <p><strong>Last updated:</strong> August 21, 2026</p>
+        <p><strong>Last updated:</strong> August 25, 2026</p>
 
         <section>
           <h2>1. Purpose of the Application</h2>
@@ -64,7 +64,19 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>4. Your responsibilities</h2>
+          <h2>4. Access controls</h2>
+          <p>
+            The public website provides project and legal information. Connected
+            Pinterest features are restricted to a private studio and its configured
+            owner account. You must not bypass authentication, use another person&apos;s
+            session, reuse private credentials, or attempt to promote your own access.
+            Public availability of the source repository does not grant access to the
+            maintainer&apos;s hosted private studio or Pinterest credentials.
+          </p>
+        </section>
+
+        <section>
+          <h2>5. Your responsibilities</h2>
           <p>
             You are responsible for the search terms you submit, references you select,
             and any work you create from your research. A Pin being visible through the
@@ -75,7 +87,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>5. Pinterest and other third-party services</h2>
+          <h2>6. Pinterest and other third-party services</h2>
           <p>
             Connected features depend on Pinterest OAuth and the Pinterest API. Your
             use of Pinterest remains subject to Pinterest’s own terms, privacy policy,
@@ -91,7 +103,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>6. Intellectual property</h2>
+          <h2>7. Intellectual property</h2>
           <p>
             The Application’s original code, interface, and branding remain the
             property of their respective owner, subject to any license included with
@@ -103,7 +115,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>7. Availability and changes</h2>
+          <h2>8. Availability and changes</h2>
           <p>
             The Application is provided on an “as available” basis. Features may be
             corrected, limited, suspended, or changed, including to comply with
@@ -114,7 +126,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>8. Disclaimers and limitation of liability</h2>
+          <h2>9. Disclaimers and limitation of liability</h2>
           <p>
             To the extent permitted by applicable law, the Application is provided
             without warranties of uninterrupted operation, accuracy, fitness for a
@@ -131,7 +143,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>9. Suspension or termination</h2>
+          <h2>10. Suspension or termination</h2>
           <p>
             You may stop using the Application at any time and may revoke Pinterest
             access through Pinterest. Access may be limited or terminated when necessary
@@ -141,7 +153,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>10. Changes to these Terms</h2>
+          <h2>11. Changes to these Terms</h2>
           <p>
             These Terms may be updated as the Application or its connected services
             evolve. Updates will be published at this URL with a revised “Last updated”
@@ -150,7 +162,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>11. Contact</h2>
+          <h2>12. Contact</h2>
           <p>
             Questions about these Terms may be sent to
             <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>.

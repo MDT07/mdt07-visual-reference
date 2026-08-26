@@ -1,70 +1,85 @@
 # Pinterest Integration Architecture
 
-## Overview
+## Access boundary
 
-MDT07 Visual Reference uses the official Pinterest API v5 with read-only access
-(`boards:read` and `pins:read`). It lists public boards available to the connected
-Pinterest account, retrieves Pins from the board selected by the user, and ranks them
-locally against the user's project brief. All
-Pinterest requests are proxied through server-side Next.js API routes. OAuth tokens
-are encrypted into a per-browser HTTP-only cookie and never exposed to the client.
+Pinterest integration exists only when `APP_MODE=studio`. Every Pinterest route first
+requires a valid Auth.js session whose GitHub account has the configured immutable
+`OWNER_GITHUB_ID`. The public deployment returns 404 for the same routes, regardless
+of any accidentally present Pinterest credentials.
+
+The approved integration remains read-only (`boards:read`, `pins:read`). It lists
+public boards available to the connected owner, retrieves Pins from the selected
+board through Pinterest API v5, and ranks them locally against a project brief. It
+does not claim global Pinterest search or write access.
+
+## Authentication sequence
+
+```text
+Owner -> GitHub OAuth -> Auth.js owner session
+Owner -> /api/pinterest/auth -> Pinterest consent
+Pinterest -> /api/pinterest/auth/callback -> state validation + token exchange
+Server -> encrypted, Secure, HTTP-only Pinterest session cookie
+Studio -> owner-protected API route -> Pinterest API v5
+```
+
+The GitHub application session and Pinterest token session are separate. A Pinterest
+cookie alone never authorizes an API request: server routes require the owner session
+first. State cookies protect the Pinterest callback, while mutation routes also verify
+the request `Origin`.
 
 ## Environment variables
 
 | Variable | Purpose |
 | --- | --- |
+| `APP_MODE` | Must be `studio` to enable private routes |
+| `APP_URL` | Exact private Studio origin |
+| `OWNER_GITHUB_ID` | Immutable numeric GitHub ID allowed to sign in |
+| `AUTH_SECRET` | Auth.js session signing secret |
+| `AUTH_GITHUB_ID` | GitHub OAuth client ID |
+| `AUTH_GITHUB_SECRET` | GitHub OAuth client secret |
 | `PINTEREST_APP_ID` | Pinterest App ID |
 | `PINTEREST_APP_SECRET` | Pinterest App Secret |
-| `PINTEREST_REDIRECT_URI` | Must match the redirect URI registered in Pinterest exactly |
-| `PINTEREST_SESSION_SECRET` | At least 32 random characters; encrypts the OAuth session cookie |
-| `PINTEREST_API_BASE` | `https://api.pinterest.com/v5` or sandbox host |
-| `PINTEREST_SEARCH_PAGE_SIZE` | Pinterest search page size |
-| `AGENT_API_ENABLED` | Explicit opt-in for developer-only `/api/agent/*` endpoints; defaults to disabled |
-| `AGENT_API_KEY` | Server-side bearer key required when the Agent API is enabled |
+| `PINTEREST_REDIRECT_URI` | Exact Pinterest callback registered for this host |
+| `PINTEREST_SESSION_SECRET` | At least 32 random characters; encrypts the token cookie |
+| `PINTEREST_API_BASE` | Production or supported Sandbox API base |
+| `PINTEREST_SEARCH_PAGE_SIZE` | Pin page size |
+
+No credential or access token belongs in a `NEXT_PUBLIC_*` variable, Git history,
+logs, screenshots, or demo fixtures.
 
 ## Search pipeline
 
 ```text
-User prompt
-    ↓
-Design Brief Parser
-    ↓
-Structured Design Intent
-    ↓
-Query Generator
-    ↓
-Pinterest List public boards, then List Pins on the selected board
-    ↓
-Raw Candidates
-    ↓
-Normalization (PinterestPin → VisualReference)
-    ↓
-Deduplication
-    ↓
-Heuristic Scoring
-    ↓
-Ranking
-    ↓
-Final References
+Project brief -> structured design intent -> query strategy
+              -> list connected account public boards
+              -> select board -> list its Pins
+              -> normalize -> deduplicate -> score -> rank
+              -> source-linked temporary references
 ```
 
-## Data flow
+Pinterest responses use `Cache-Control: no-store`. The web UI retains results and
+moodboard selections only in open-page React state. The current application does not
+persist Pinterest content in a database.
 
-- Browser sends search request to `/api/pinterest/search`.
-- Server decrypts the Pinterest session cookie.
-- Pipeline interprets the project brief, retrieves a page of public Pins from the board selected by the connected user, deduplicates, scores, and ranks results locally.
-- Results are returned as `SearchPipelineResult` and displayed in the UI.
+## Production redirect values
 
-## Optional developer project storage
+- Local: `http://localhost:3000/api/pinterest/auth/callback`
+- Production:
+  `https://mdt07-reference-studio.vercel.app/api/pinterest/auth/callback`
 
-The developer-only Agent API can store research projects and collections in
-`data/projects.json` for local, single-user testing. It is disabled by default and
-must remain disabled on the public Pinterest review deployment. The public web UI
-does not call this store; its moodboard remains only in the open browser page.
+Do not use the public website as the production callback after private Studio cutover
+and do not register a preview deployment URL. The value above uses the stable private
+origin and must match Pinterest configuration exactly. Register it only after GitHub
+owner authentication works on that host.
 
-## Limitations
+## Known hardening work
 
-- Listing public boards and Pins on a selected board requires the read-only `boards:read` and `pins:read` scopes.
-- Global Pinterest discovery is not claimed; the public application uses public boards available to the connected account and Pins contained in the selected board.
-- The optional JSON project store is not suitable for Vercel production runtime.
-- AI visual analysis is planned as a future enhancement.
+- Replace in-memory rate limiting with a shared server-side store.
+- Replace cookie-contained Pinterest credentials with revocable server-side token
+  records before expanding access beyond the owner.
+- Replace local JSON project storage before enabling Agent API in production.
+- Rotate all credentials previously handled during development before final cutover.
+- Add audited write actions only if a later product need justifies additional scopes.
+
+See `docs/threat-model.md` and `docs/private-studio-migration.md` for acceptance and
+cutover requirements.

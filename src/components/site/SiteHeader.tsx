@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { deploymentConfig } from "@/lib/deployment";
 
 const navigation = [
   { href: "/", label: "Home" },
@@ -6,6 +7,11 @@ const navigation = [
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
   { href: "/contact", label: "Contact" },
+];
+
+const studioNavigation = [
+  { href: "/studio", label: "Studio" },
+  { href: "/admin", label: "Admin" },
 ];
 
 export default function SiteHeader() {
@@ -28,7 +34,7 @@ export default function SiteHeader() {
 
         <nav aria-label="Primary navigation">
           <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-text-secondary">
-            {navigation.map((item) => (
+            {[...navigation, ...(deploymentConfig.isStudio ? studioNavigation : [])].map((item) => (
               <li key={item.href}>
                 <Link className="transition-colors hover:text-brand" href={item.href}>
                   {item.label}

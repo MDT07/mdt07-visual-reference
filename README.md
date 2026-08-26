@@ -1,71 +1,77 @@
 # MDT07 Visual Reference
 
-A project-scoped visual research workspace for web design and development. The
-application turns a specific project brief into a temporary comparison workspace,
-retrieves source-linked Pinterest references through server-side API routes, and keeps
-selected references only in the current open page.
+A private, project-scoped visual research studio with a public product and legal
+website. The studio lets its owner connect Pinterest with read-only access, select a
+public board, rank Pins against a web-project brief, and compare source-linked
+references in a temporary moodboard.
 
 MDT07 Visual Reference is an independent project. It is not endorsed by, affiliated
 with, or an official product of Pinterest.
 
-## Repository and production site
+## Deployment boundary
+
+The same codebase supports two deliberately separate deployments:
+
+| Mode | `APP_MODE` | Purpose |
+| --- | --- | --- |
+| Public website | `public` or unset | Product information and public legal pages only |
+| Private studio | `studio` | GitHub owner sign-in, Pinterest OAuth/API, Studio, and Admin |
+
+`APP_MODE` fails closed to `public`. In public mode, private pages and Auth/Pinterest
+API routes return 404 even if credentials are accidentally present in the environment.
+
+Current verified public identity:
 
 - GitHub owner: `MDT07`
-- Current repository: `mdt07-visual-reference`
-- Repository URL: `https://github.com/MDT07/mdt07-visual-reference`
-- GitHub profile: `https://github.com/MDT07`
-- Production website: `https://mdt07-visual-reference.vercel.app/`
+- Repository: `https://github.com/MDT07/mdt07-visual-reference`
+- Public website: `https://mdt07-visual-reference.vercel.app/`
 - Privacy Policy: `https://mdt07-visual-reference.vercel.app/privacy`
-- Production OAuth callback:
-  `https://mdt07-visual-reference.vercel.app/api/pinterest/auth/callback`
+- Private Studio: `https://mdt07-reference-studio.vercel.app/`
 
-Vercel hosts both the public review website and the server-side Next.js application so
-the product pages, Privacy Policy, and OAuth callback use one stable production host.
+GitHub owner authentication and the read-only Pinterest OAuth flow were verified on
+the private host on August 27, 2026. The public host remains the product and legal
+website; connected functionality belongs only on the private Studio deployment.
 
 ## Features
 
 - Public Home, About, Privacy Policy, Terms of Service, and Contact pages
-- Pinterest OAuth 2.0 with a short-lived state cookie
-- Read-only listing of public boards and retrieval of Pins from the board selected by the connected user through Pinterest API v5
-  using `boards:read` and `pins:read`
-- Per-browser encrypted HTTP-only token sessions; no shared user token
-- Authenticated API routes with short-lived rate limiting
+- Private GitHub owner authentication through Auth.js
+- Pinterest OAuth 2.0 protected by both owner auth and a short-lived state cookie
+- Read-only `boards:read` and `pins:read` access
+- Per-browser encrypted HTTP-only Pinterest token session
+- Board Pin retrieval and local relevance ranking against a project brief
 - Session-only reference moodboard with original Pinterest source links
-- Per-page metadata, Open Graph image, favicon, robots, and sitemap
+- Fail-closed deployment modes, mutation origin checks, security headers, and CI
+- No public registration and no shared Pinterest account access
 
 ## Stack and entry points
 
-- Next.js 16 App Router
-- React 19
-- TypeScript 5
-- Tailwind CSS 4
-- Main page: `src/app/page.tsx`
+- Next.js 16 App Router and server routes
+- React 19, TypeScript 5, Tailwind CSS 4
+- Public home: `src/app/page.tsx`
+- Private studio: `src/app/studio/page.tsx`
+- Owner administration: `src/app/admin/page.tsx`
 - Shared layout: `src/app/layout.tsx`
+- Auth configuration: `src/auth.ts`
+- Route boundary: `src/proxy.ts`
 - API routes: `src/app/api/`
 
-## Public routes
+## Routes
 
-| Route | Purpose |
-| --- | --- |
-| `/` | Product explanation, Pinterest search, and session moodboard |
-| `/about` | Project purpose and workflow |
-| `/privacy` | Public Privacy Policy |
-| `/terms` | Terms of Service |
-| `/contact` | Email and GitHub contact information |
-| `/robots.txt` | Crawler rules |
-| `/sitemap.xml` | Public route index |
-
-## API routes
-
-| Route | Purpose |
-| --- | --- |
-| `/api/pinterest/auth` | Start Pinterest OAuth |
-| `/api/pinterest/auth/callback` | Validate OAuth state and exchange the code |
-| `/api/pinterest/auth/refresh` | Refresh an access token |
-| `/api/pinterest/auth/disconnect` | Delete the current browser's encrypted token session |
-| `/api/pinterest/search?q=...` | Search Pins |
+| Route | Public mode | Studio mode |
+| --- | --- | --- |
+| `/` | Product website | Product website |
+| `/about`, `/privacy`, `/terms`, `/contact` | Public | Public |
+| `/login` | 404 | Owner sign-in |
+| `/studio` | 404 | Authenticated visual workspace |
+| `/admin` | 404 | Authenticated configuration status |
+| `/api/auth/*` | 404 | Auth.js owner authentication |
+| `/api/pinterest/*` | 404 | Authenticated Pinterest OAuth/API |
+| `/api/agent/*` | 404 by default | Optional developer-only API |
 
 ## Local development
+
+Public mode requires no secrets:
 
 ```bash
 npm install
@@ -73,94 +79,93 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open `http://localhost:3000`. The OAuth Redirect URI registered in Pinterest must
-exactly match `PINTEREST_REDIRECT_URI`.
+For private Studio development, set `APP_MODE=studio`, configure GitHub OAuth and
+Pinterest server variables, and register the exact localhost callbacks with each
+provider. See `.env.example` and `docs/private-studio-migration.md`.
 
 ## Environment variables
 
-All Pinterest credentials and tokens are server-side variables. Do not prefix them
-with `NEXT_PUBLIC_`, put them in browser code, or commit `.env.local`.
+All authentication and Pinterest values are server-side. Never prefix them with
+`NEXT_PUBLIC_`, expose them to client components, or commit `.env.local`.
 
 ```bash
-SITE_URL=http://localhost:3000
-SITE_DOMAIN=localhost
+APP_MODE=public
+PUBLIC_SITE_URL=https://mdt07-visual-reference.vercel.app
+APP_URL=https://mdt07-visual-reference.vercel.app
 
+# Studio-only owner authentication
+OWNER_GITHUB_ID=
+AUTH_SECRET=
+AUTH_GITHUB_ID=
+AUTH_GITHUB_SECRET=
+AUTH_TRUST_HOST=true
+
+# Studio-only Pinterest integration
 PINTEREST_APP_ID=
 PINTEREST_APP_SECRET=
-PINTEREST_REDIRECT_URI=http://localhost:3000/api/pinterest/auth/callback
+PINTEREST_REDIRECT_URI=
 PINTEREST_SESSION_SECRET=
-
 PINTEREST_API_BASE=https://api.pinterest.com/v5
 PINTEREST_SEARCH_PAGE_SIZE=25
 
-# Optional developer-only endpoints; keep disabled for the public review site
+# Optional private developer endpoints
 AGENT_API_ENABLED=false
 AGENT_API_KEY=
 ```
 
-`PINTEREST_SESSION_SECRET` must contain at least 32 random characters. OAuth tokens are
-encrypted into a Secure, HTTP-only cookie scoped to the browser that completed OAuth.
-They are not shared through process memory, exposed to browser JavaScript, or persisted
-in an application database. Pinterest API content is returned with `no-store` and kept
-only in the current page state.
+`OWNER_GITHUB_ID` must be the immutable numeric GitHub account ID, not a mutable
+username. `AUTH_SECRET` and `PINTEREST_SESSION_SECRET` must each contain at least 32
+cryptographically random characters.
+Pinterest tokens are encrypted into a Secure, HTTP-only cookie and are not exposed to
+browser JavaScript or stored in the repository.
 
-The optional `/api/agent/*` endpoints are disabled unless
-`AGENT_API_ENABLED=true` and require a server-side bearer key when enabled. They
-must remain disabled on the public Pinterest review deployment unless their data
-handling and storage are separately reviewed and documented.
+## Deployment
 
-## Production deployment
+Use two separate Vercel projects:
 
-Set these variables in the Vercel project settings:
+1. Public project: `APP_MODE=public`, public URL only, no Auth/Pinterest/Agent secrets.
+2. Private Studio project: `APP_MODE=studio`,
+   `https://mdt07-reference-studio.vercel.app`, owner Auth.js and Pinterest
+   variables, plus the exact provider callback URLs.
+
+After the private deployment is verified, register these exact callbacks:
+
+- GitHub OAuth callback:
+  `https://mdt07-reference-studio.vercel.app/api/auth/callback/github`
+- Pinterest local callback: `http://localhost:3000/api/pinterest/auth/callback`
+- Pinterest production callback:
+  `https://mdt07-reference-studio.vercel.app/api/pinterest/auth/callback`
+
+The Pinterest Company/App Website and Privacy Policy should remain the public URLs
+shown above. The production Pinterest Redirect URI must use the verified private
+Studio origin and match Pinterest configuration character-for-character.
+
+See `docs/private-studio-migration.md`, `docs/threat-model.md`, and
+`docs/architecture/` before cutover.
+
+## Verification
 
 ```bash
-SITE_URL=https://mdt07-visual-reference.vercel.app
-SITE_DOMAIN=mdt07-visual-reference.vercel.app
-PINTEREST_APP_ID=...
-PINTEREST_APP_SECRET=...
-PINTEREST_REDIRECT_URI=https://mdt07-visual-reference.vercel.app/api/pinterest/auth/callback
-PINTEREST_SESSION_SECRET=...
+npm run lint
+npm run typecheck
+npm test
+npm run build
 ```
 
-Redeploy after changing environment variables. Never use a temporary Vercel preview
-URL as the registered production Redirect URI.
+CI also runs a production build, dependency audit, and CodeQL analysis. Dependabot is
+configured for npm and GitHub Actions updates.
 
-## Pinterest App registration values
+## Current limitations
 
-Use these values only after the updated production deployment has been verified:
-
-| Pinterest field | Value |
-| --- | --- |
-| Company website / App link | `https://mdt07-visual-reference.vercel.app/` |
-| Privacy Policy | `https://mdt07-visual-reference.vercel.app/privacy` |
-| Redirect URI (local) | `http://localhost:3000/api/pinterest/auth/callback` |
-| Redirect URI (production) | `https://mdt07-visual-reference.vercel.app/api/pinterest/auth/callback` |
-
-Suggested access-request description:
-
-> MDT07 Visual Reference is a project-scoped creative research workspace for web
-> designers and developers. A user starts with a specific website or interface brief,
-> authorizes read-only Pinterest access, chooses a public board available to the connected
-> account, and ranks its Pins against a project brief before the user compares selected
-> references in a temporary session workspace and creates original work.
-> Pinterest API content is not persisted, every Pin links to its original Pinterest
-> source, and the application requests only `boards:read` and `pins:read`.
-
-## Pinterest Sandbox
-
-Pinterest Sandbox is separate from production and uses its own API host and token. A
-Sandbox token generated in Pinterest App management currently lasts 30 days. Set
-`PINTEREST_API_BASE=https://api-sandbox.pinterest.com/v5` only for endpoints Pinterest
-lists as Sandbox-supported, and never reuse a Sandbox token in production. See the
-official [Pinterest Sandbox documentation](https://developers.pinterest.com/docs/developer-tools/sandbox/).
-
-Before requesting access, review the current [Pinterest Developer Guidelines](https://policy.pinterest.com/en/developer-guidelines)
-and [access tier requirements](https://developers.pinterest.com/docs/key-concepts/access-tiers/).
-
-## Repository
-
-The source repository is `MDT07/mdt07-visual-reference`, matching the application name
-and Vercel production alias.
+- Rate limiting is process-local and must be replaced with a shared production store
+  before relying on it across serverless instances.
+- The encrypted Pinterest session is browser-cookie based rather than a revocable
+  server-side session record.
+- The optional JSON project store is local-development-only and unsuitable for Vercel.
+- AI visual analysis and Pinterest write operations are not implemented or claimed.
+- Credential rotation is intentionally deferred during the active integration phase;
+  rotate all previously handled credentials before expanding access beyond the owner
+  or treating the security milestone as complete.
 
 ## Contact
 
