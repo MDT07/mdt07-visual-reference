@@ -1,7 +1,7 @@
 # Private studio migration and rollback runbook
 
-The approved public deployment must remain unchanged until the private preview
-passes all checks.
+During migration, the approved public deployment remained unchanged until the
+private preview passed all checks. The split deployment cutover is now complete.
 
 ## Current status — August 27, 2026
 
@@ -19,8 +19,17 @@ passes all checks.
   console.
 - Confirmed unauthenticated Studio/Admin redirects, 403 Pinterest APIs, 404 Agent API,
   and full-host `robots.txt` exclusion.
-- The existing public production remains unchanged until the reviewed branch is
-  merged and the public cutover checks below pass.
+- Merged the reviewed private-boundary branch into `main` and deployed the same
+  verified codebase to both Vercel projects.
+- Switched the public host to `APP_MODE=public`, removed Pinterest and Agent secrets
+  from that Vercel project, and redeployed from the cleaned environment.
+- Verified the public Home, About, Privacy, Terms, and Contact routes, canonical
+  metadata, security headers, and contact links. Verified that private pages and
+  Auth/Pinterest/Agent handlers fail closed on the public host.
+- Reverified the private owner session, connected Pinterest status, two public
+  boards, and a live uncached 15-Pin search after the final redeploy.
+- Kept the old public Pinterest callback registered temporarily for rollback and
+  observation; the public application no longer serves the callback route.
 
 ## Preparation
 
