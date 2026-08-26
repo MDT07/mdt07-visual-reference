@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import OwnerSignOut from "@/components/auth/OwnerSignOut";
 import { getOwnerSession } from "@/lib/auth/authorization";
@@ -16,6 +16,8 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminPage() {
+  if (!deploymentConfig.isStudio) notFound();
+
   const owner = await getOwnerSession();
   if (!owner) redirect("/login");
 

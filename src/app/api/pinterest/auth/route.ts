@@ -13,7 +13,7 @@ export async function GET(): Promise<NextResponse> {
   if (!isPinterestConfigured()) {
     return NextResponse.json(
       { error: "Pinterest OAuth is not configured for this deployment." },
-      { status: 503 }
+      { status: 503, headers: { "Cache-Control": "no-store" } }
     );
   }
 

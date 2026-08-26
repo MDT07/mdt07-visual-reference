@@ -37,12 +37,21 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Search limit reached. Try again shortly." },
-      { status: 429, headers: rateLimitHeaders(rateLimit) }
+      {
+        status: 429,
+        headers: {
+          ...rateLimitHeaders(rateLimit),
+          "Cache-Control": "no-store",
+        },
+      }
     );
   }
 
   if (!prompt || prompt.trim().length === 0) {
-    return NextResponse.json({ error: "Missing query" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing query" },
+      { status: 400, headers: { "Cache-Control": "no-store" } }
+    );
   }
 
   if (!boardId || !/^\d+$/.test(boardId)) {
@@ -53,7 +62,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   if (prompt.length > 500) {
-    return NextResponse.json({ error: "Query too long" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Query too long" },
+      { status: 400, headers: { "Cache-Control": "no-store" } }
+    );
   }
 
   try {

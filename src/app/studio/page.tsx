@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import OwnerSignOut from "@/components/auth/OwnerSignOut";
 import ReferencesSearchShell from "@/components/pinterest/ReferencesSearchShell";
 import { getOwnerSession } from "@/lib/auth/authorization";
 import { isPinterestConfigured } from "@/lib/config";
+import { deploymentConfig } from "@/lib/deployment";
 import { getPinterestSessionFromCookies } from "@/lib/pinterest/session";
 import { REFERENCE_PRESETS } from "@/lib/reference-presets";
 
@@ -17,6 +18,8 @@ export const metadata: Metadata = {
 };
 
 export default async function StudioPage() {
+  if (!deploymentConfig.isStudio) notFound();
+
   const owner = await getOwnerSession();
   if (!owner) redirect("/login");
 

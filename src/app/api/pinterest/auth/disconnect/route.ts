@@ -11,7 +11,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (accessError) return accessError;
 
   if (!hasValidMutationOrigin(request)) {
-    return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
+    return NextResponse.json(
+      { error: "Invalid request origin." },
+      { status: 403, headers: { "Cache-Control": "no-store" } }
+    );
   }
 
   const redirectUrl = new URL(getAppUrl("/studio"));

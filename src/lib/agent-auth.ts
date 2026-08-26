@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { agentApiConfig } from "@/lib/config";
 import { requireOwnerApi } from "@/lib/auth/authorization";
 
+const noStoreHeaders = { "Cache-Control": "no-store" } as const;
+
 function keysMatch(provided: string, expected: string): boolean {
   const providedBuffer = Buffer.from(provided, "utf8");
   const expectedBuffer = Buffer.from(expected, "utf8");
@@ -19,7 +21,10 @@ export async function requireAgentApiAuth(
   request: NextRequest
 ): Promise<NextResponse | null> {
   if (!agentApiConfig.enabled) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Not found" },
+      { status: 404, headers: noStoreHeaders }
+    );
   }
 
   const ownerError = await requireOwnerApi();
@@ -28,7 +33,7 @@ export async function requireAgentApiAuth(
   if (!agentApiConfig.apiKey) {
     return NextResponse.json(
       { error: "Agent API is not configured." },
-      { status: 503 }
+      { status: 503, headers: noStoreHeaders }
     );
   }
 
@@ -39,7 +44,10 @@ export async function requireAgentApiAuth(
       { error: "Agent API authentication is required." },
       {
         status: 401,
-        headers: { "WWW-Authenticate": "Bearer" },
+        headers: {
+          ...noStoreHeaders,
+          "WWW-Authenticate": "Bearer",
+        },
       }
     );
   }
@@ -50,7 +58,10 @@ export async function requireAgentApiAuth(
       { error: "Agent API authentication failed." },
       {
         status: 401,
-        headers: { "WWW-Authenticate": "Bearer" },
+        headers: {
+          ...noStoreHeaders,
+          "WWW-Authenticate": "Bearer",
+        },
       }
     );
   }
