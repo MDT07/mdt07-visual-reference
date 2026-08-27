@@ -8,15 +8,35 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 export interface ReferenceCollection {
   id: string;
   name: string;
-  references: VisualReference[];
+  description: string;
+  sortOrder: number;
+  references: SavedReference[];
   createdAt: string;
   updatedAt: string;
+}
+
+export type ProjectStatus = "active" | "archived";
+export type ReferenceWorkflowStatus = "saved" | "shortlisted" | "archived";
+
+export interface ReferenceCatalogMetadata {
+  recordId: string;
+  notes: string;
+  tags: string[];
+  favorite: boolean;
+  status: ReferenceWorkflowStatus;
+  savedAt: string;
+  updatedAt: string;
+}
+
+export interface SavedReference extends VisualReference {
+  catalog: ReferenceCatalogMetadata;
 }
 
 export interface ResearchProject {
   id: string;
   name: string;
   brief: string;
+  status: ProjectStatus;
   collections: ReferenceCollection[];
   createdAt: string;
   updatedAt: string;
@@ -28,8 +48,20 @@ function ownerGithubId(): string {
   return ownerId;
 }
 
-function referenceFromJson(value: Json): VisualReference {
-  return value as unknown as VisualReference;
+async function touchProject(projectId: string, updatedAt = new Date().toISOString()): Promise<void> {
+  const { error } = await getSupabaseAdmin()
+    .from("mdt07_projects")
+    .update({ updated_at: updatedAt })
+    .eq("id", projectId)
+    .eq("owner_github_id", ownerGithubId());
+  if (error) throw error;
+}
+
+function referenceFromJson(
+  value: Json,
+  catalog: ReferenceCatalogMetadata
+): SavedReference {
+  return { ...(value as unknown as VisualReference), catalog };
 }
 
 async function audit(
@@ -53,7 +85,7 @@ export async function listProjects(): Promise<ResearchProject[]> {
   const supabase = getSupabaseAdmin();
   const { data: projects, error: projectsError } = await supabase
     .from("mdt07_projects")
-    .select("id,name,brief,created_at,updated_at")
+    .select("id,name,brief,status,created_at,updated_at")
     .eq("owner_github_id", ownerId)
     .order("updated_at", { ascending: false });
   if (projectsError) throw projectsError;
@@ -64,13 +96,13 @@ export async function listProjects(): Promise<ResearchProject[]> {
     await Promise.all([
       supabase
         .from("mdt07_collections")
-        .select("id,project_id,name,created_at,updated_at")
+        .select("id,project_id,name,description,sort_order,created_at,updated_at")
         .eq("owner_github_id", ownerId)
         .in("project_id", projectIds)
         .order("updated_at", { ascending: false }),
       supabase
         .from("mdt07_references")
-        .select("project_id,collection_id,reference_data,saved_at")
+        .select("id,project_id,collection_id,reference_data,notes,tags,favorite,workflow_status,saved_at,updated_at")
         .eq("owner_github_id", ownerId)
         .in("project_id", projectIds)
         .order("saved_at", { ascending: false }),
@@ -82,6 +114,7 @@ export async function listProjects(): Promise<ResearchProject[]> {
     id: project.id,
     name: project.name,
     brief: project.brief,
+    status: project.status,
     createdAt: project.created_at,
     updatedAt: project.updated_at,
     collections: (collections ?? [])
@@ -89,11 +122,23 @@ export async function listProjects(): Promise<ResearchProject[]> {
       .map((collection) => ({
         id: collection.id,
         name: collection.name,
+        description: collection.description,
+        sortOrder: collection.sort_order,
         createdAt: collection.created_at,
         updatedAt: collection.updated_at,
         references: (references ?? [])
           .filter((reference) => reference.collection_id === collection.id)
-          .map((reference) => referenceFromJson(reference.reference_data)),
+          .map((reference) =>
+            referenceFromJson(reference.reference_data, {
+              recordId: reference.id,
+              notes: reference.notes,
+              tags: reference.tags,
+              favorite: reference.favorite,
+              status: reference.workflow_status,
+              savedAt: reference.saved_at,
+              updatedAt: reference.updated_at,
+            })
+          ),
       })),
   }));
 }
@@ -109,7 +154,7 @@ export async function createProject(name: string, brief: string): Promise<Resear
   const { data, error } = await getSupabaseAdmin()
     .from("mdt07_projects")
     .insert({ owner_github_id: ownerId, name: name.trim(), brief: brief.trim(), updated_at: now })
-    .select("id,name,brief,created_at,updated_at")
+    .select("id,name,brief,status,created_at,updated_at")
     .single();
   if (error) throw error;
   await audit("project.created", "project", data.id);
@@ -117,10 +162,117 @@ export async function createProject(name: string, brief: string): Promise<Resear
     id: data.id,
     name: data.name,
     brief: data.brief,
+    status: data.status,
     collections: [],
     createdAt: data.created_at,
     updatedAt: data.updated_at,
   };
+}
+
+export async function updateProject(
+  id: string,
+  updates: { name?: string; brief?: string; status?: ProjectStatus }
+): Promise<ResearchProject | null> {
+  const now = new Date().toISOString();
+  const payload: { name?: string; brief?: string; status?: ProjectStatus; updated_at: string } = {
+    updated_at: now,
+  };
+  if (updates.name !== undefined) payload.name = updates.name.trim();
+  if (updates.brief !== undefined) payload.brief = updates.brief.trim();
+  if (updates.status !== undefined) payload.status = updates.status;
+
+  const { data, error } = await getSupabaseAdmin()
+    .from("mdt07_projects")
+    .update(payload)
+    .eq("id", id)
+    .eq("owner_github_id", ownerGithubId())
+    .select("id")
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  await audit("project.updated", "project", id, {
+    fields: Object.keys(updates),
+  });
+  return getProject(id);
+}
+
+export async function createCollection(
+  projectId: string,
+  name: string,
+  description = ""
+): Promise<ResearchProject | null> {
+  const ownerId = ownerGithubId();
+  const supabase = getSupabaseAdmin();
+  const { data: project, error: projectError } = await supabase
+    .from("mdt07_projects")
+    .select("id")
+    .eq("id", projectId)
+    .eq("owner_github_id", ownerId)
+    .maybeSingle();
+  if (projectError) throw projectError;
+  if (!project) return null;
+
+  const now = new Date().toISOString();
+  const { error } = await supabase.from("mdt07_collections").insert({
+    project_id: projectId,
+    owner_github_id: ownerId,
+    name: name.trim(),
+    description: description.trim(),
+    updated_at: now,
+  });
+  if (error) throw error;
+  await touchProject(projectId, now);
+  await audit("collection.created", "project", projectId, { name: name.trim() });
+  return getProject(projectId);
+}
+
+export async function updateCollection(
+  projectId: string,
+  collectionId: string,
+  updates: { name?: string; description?: string }
+): Promise<ResearchProject | null> {
+  const ownerId = ownerGithubId();
+  const payload: { name?: string; description?: string; updated_at: string } = {
+    updated_at: new Date().toISOString(),
+  };
+  if (updates.name !== undefined) payload.name = updates.name.trim();
+  if (updates.description !== undefined) payload.description = updates.description.trim();
+  const { data, error } = await getSupabaseAdmin()
+    .from("mdt07_collections")
+    .update(payload)
+    .eq("id", collectionId)
+    .eq("project_id", projectId)
+    .eq("owner_github_id", ownerId)
+    .select("id")
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  await touchProject(projectId, payload.updated_at);
+  await audit("collection.updated", "collection", collectionId, {
+    projectId,
+    fields: Object.keys(updates),
+  });
+  return getProject(projectId);
+}
+
+export async function deleteCollection(
+  projectId: string,
+  collectionId: string
+): Promise<ResearchProject | null> {
+  const ownerId = ownerGithubId();
+  const { data, error } = await getSupabaseAdmin()
+    .from("mdt07_collections")
+    .delete()
+    .eq("id", collectionId)
+    .eq("project_id", projectId)
+    .eq("owner_github_id", ownerId)
+    .select("id")
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  await touchProject(projectId);
+  await audit("collection.deleted", "collection", collectionId, { projectId });
+  return getProject(projectId);
 }
 
 export async function deleteProject(id: string): Promise<boolean> {
@@ -180,12 +332,7 @@ export async function addReferenceToProject(
   );
   if (referenceError) throw referenceError;
 
-  const { error: touchError } = await supabase
-    .from("mdt07_projects")
-    .update({ updated_at: now })
-    .eq("id", projectId)
-    .eq("owner_github_id", ownerId);
-  if (touchError) throw touchError;
+  await touchProject(projectId, now);
   await audit("reference.saved", "reference", reference.sourceId, {
     projectId,
     collection: normalizedCollection,
@@ -231,6 +378,94 @@ export async function removeReferenceFromProject(
     .eq("source_id", sourceId);
   if (error) throw error;
 
+  await touchProject(projectId);
   await audit("reference.removed", "reference", sourceId, { projectId });
   return getProject(projectId);
+}
+
+export async function updateReferenceCatalog(
+  projectId: string,
+  collectionId: string,
+  referenceRecordId: string,
+  updates: {
+    notes?: string;
+    tags?: string[];
+    favorite?: boolean;
+    status?: ReferenceWorkflowStatus;
+  }
+): Promise<ResearchProject | null> {
+  const ownerId = ownerGithubId();
+  const payload: {
+    notes?: string;
+    tags?: string[];
+    favorite?: boolean;
+    workflow_status?: ReferenceWorkflowStatus;
+    updated_at: string;
+  } = { updated_at: new Date().toISOString() };
+  if (updates.notes !== undefined) payload.notes = updates.notes.trim();
+  if (updates.tags !== undefined) payload.tags = updates.tags;
+  if (updates.favorite !== undefined) payload.favorite = updates.favorite;
+  if (updates.status !== undefined) payload.workflow_status = updates.status;
+
+  const { data, error } = await getSupabaseAdmin()
+    .from("mdt07_references")
+    .update(payload)
+    .eq("id", referenceRecordId)
+    .eq("project_id", projectId)
+    .eq("collection_id", collectionId)
+    .eq("owner_github_id", ownerId)
+    .select("id")
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  await touchProject(projectId, payload.updated_at);
+  await audit("reference.annotated", "reference", referenceRecordId, {
+    projectId,
+    collectionId,
+    fields: Object.keys(updates),
+  });
+  return getProject(projectId);
+}
+
+export interface AuditEvent {
+  id: number;
+  action: string;
+  targetType: string | null;
+  targetId: string | null;
+  metadata: Json;
+  createdAt: string;
+}
+
+export async function listAuditEvents(limit = 50): Promise<AuditEvent[]> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("mdt07_audit_events")
+    .select("id,action,target_type,target_id,metadata,created_at")
+    .eq("owner_github_id", ownerGithubId())
+    .order("created_at", { ascending: false })
+    .limit(Math.max(1, Math.min(100, limit)));
+  if (error) throw error;
+  return (data ?? []).map((event) => ({
+    id: event.id,
+    action: event.action,
+    targetType: event.target_type,
+    targetId: event.target_id,
+    metadata: event.metadata,
+    createdAt: event.created_at,
+  }));
+}
+
+export async function cleanupExpiredSecurityState(): Promise<{
+  expiredConnections: number;
+  expiredRateLimits: number;
+}> {
+  const { data, error } = await getSupabaseAdmin().rpc(
+    "mdt07_cleanup_expired_security_state",
+    {}
+  );
+  if (error) throw error;
+  const result = data?.[0];
+  return {
+    expiredConnections: result?.expired_connections ?? 0,
+    expiredRateLimits: result?.expired_rate_limits ?? 0,
+  };
 }

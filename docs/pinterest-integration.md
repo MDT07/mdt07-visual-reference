@@ -63,7 +63,10 @@ Project brief -> structured design intent -> query strategy
 Pinterest responses use `Cache-Control: no-store`. Unsaved results remain in open-page
 React state. When the owner explicitly saves a reference, the application persists
 selected Pin metadata and the original source URL in Supabase; Pinterest media files
-remain at their original source and are not copied into application storage.
+remain at their original source and are not copied into application storage. Notes,
+tags, favorite state, and workflow status are app-owned annotations entered by the
+owner. They do not require additional Pinterest scopes and are included in the
+owner-only JSON catalog export.
 
 ## Production redirect values
 

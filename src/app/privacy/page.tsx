@@ -82,7 +82,9 @@ export default function PrivacyPage() {
           <p>
             When the private-studio owner explicitly saves a reference, the Application
             stores the project name, project brief, collection name, relevant Pin
-            metadata, and original Pinterest source URL in its Supabase database. It
+            metadata, original Pinterest source URL, and owner-authored catalog details
+            such as notes, tags, favorite state, and workflow status in its Supabase
+            database. It
             does not copy Pinterest image or video files into its own storage. Unsaved
             search results remain transient and are not added to a project automatically.
           </p>
@@ -219,9 +221,9 @@ export default function PrivacyPage() {
           <p>
             Use the Disconnect control to delete both the opaque browser cookie and its
             encrypted Pinterest connection record. You can also revoke the Application in Pinterest
-            account settings. Saved projects or references can be deleted through the
-            private studio as those controls become available, or by contacting the
-            project. For questions or a request concerning other information,
+            account settings. Saved projects, collections, and references can be deleted
+            through the private studio, and the owner can download an app-owned catalog
+            export in JSON format. For questions or a request concerning other information,
             email <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>.
             Routine security logs may remain until the hosting provider’s normal
             retention cycle completes.

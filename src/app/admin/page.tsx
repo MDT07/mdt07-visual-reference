@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
+import OwnerDataActions from "@/components/admin/OwnerDataActions";
 import OwnerSignOut from "@/components/auth/OwnerSignOut";
 import { getOwnerSession } from "@/lib/auth/authorization";
 import { isPinterestConfigured } from "@/lib/config";
 import { deploymentConfig, isOwnerAuthConfigured } from "@/lib/deployment";
 import { getPinterestSessionFromCookies } from "@/lib/pinterest/session";
+import { listAuditEvents } from "@/lib/store/projects";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +26,7 @@ export default async function AdminPage() {
   const pinterestConfigured = isPinterestConfigured();
   const pinterestConnected =
     pinterestConfigured && Boolean(await getPinterestSessionFromCookies());
+  const auditEvents = await listAuditEvents(20);
 
   const checks = [
     ["Deployment mode", deploymentConfig.appMode],
@@ -67,6 +70,53 @@ export default async function AdminPage() {
           </div>
         ))}
       </dl>
+
+      <section className="mt-12 space-y-5 border-t border-surface-2 pt-10">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight text-text-primary">
+            Owner data controls
+          </h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-text-secondary">
+            Export app-owned catalog data or remove only expired OAuth and rate-limit records.
+            Project and reference data is never removed by maintenance.
+          </p>
+        </div>
+        <OwnerDataActions />
+      </section>
+
+      <section className="mt-12 space-y-5 border-t border-surface-2 pt-10">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight text-text-primary">
+            Recent owner activity
+          </h2>
+          <p className="mt-2 text-sm text-text-secondary">
+            The latest security and catalog events. Secret values and Pinterest tokens are never logged here.
+          </p>
+        </div>
+        {auditEvents.length === 0 ? (
+          <p className="text-sm text-text-tertiary">No audit events recorded yet.</p>
+        ) : (
+          <ol className="divide-y divide-surface-3 overflow-hidden rounded-xl border border-surface-3 bg-surface-1">
+            {auditEvents.map((event) => (
+              <li key={event.id} className="grid gap-1 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
+                <div>
+                  <p className="text-sm font-medium text-text-primary">{event.action}</p>
+                  <p className="mt-1 text-xs text-text-tertiary">
+                    {event.targetType ?? "system"}{event.targetId ? ` · ${event.targetId}` : ""}
+                  </p>
+                </div>
+                <time className="text-xs text-text-tertiary" dateTime={event.createdAt}>
+                  {new Intl.DateTimeFormat("en", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                    timeZone: "UTC",
+                  }).format(new Date(event.createdAt))} UTC
+                </time>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
     </main>
   );
 }

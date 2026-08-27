@@ -4,11 +4,16 @@ import { useEffect, useState } from "react";
 
 import type { VisualReference } from "@/lib/pinterest/types";
 import type { SearchPipelineResult } from "@/lib/search/types";
-import type { ResearchProject } from "@/lib/store/projects";
+import type {
+  ResearchProject,
+  SavedReference,
+} from "@/lib/store/projects";
 import SearchForm from "./SearchForm";
 import ReferenceCard from "@/components/search/ReferenceCard";
 import CurateButton from "./CurateButton";
-import MoodboardGrid from "./MoodboardGrid";
+import SavedReferenceCatalog, {
+  type ReferenceCatalogUpdate,
+} from "./SavedReferenceCatalog";
 
 interface ReferencesSearchShellProps {
   presets: string[];
@@ -61,18 +66,50 @@ export default function ReferencesSearchShell({
   const [boardsError, setBoardsError] = useState<string | null>(null);
   const [projects, setProjects] = useState(initialProjects);
   const [selectedProjectId, setSelectedProjectId] = useState(initialProjects[0]?.id ?? "");
+  const [selectedCollectionId, setSelectedCollectionId] = useState(
+    initialProjects[0]?.collections[0]?.id ?? ""
+  );
   const [collectionName, setCollectionName] = useState(
     initialProjects[0]?.collections[0]?.name ?? "Primary references"
   );
+  const [collectionDescription, setCollectionDescription] = useState(
+    initialProjects[0]?.collections[0]?.description ?? ""
+  );
+  const [collectionSaving, setCollectionSaving] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [projectBrief, setProjectBrief] = useState("");
   const [projectSaving, setProjectSaving] = useState(false);
+  const [activeProjectName, setActiveProjectName] = useState(initialProjects[0]?.name ?? "");
+  const [activeProjectBrief, setActiveProjectBrief] = useState(initialProjects[0]?.brief ?? "");
+  const [activeProjectStatus, setActiveProjectStatus] = useState<"active" | "archived">(
+    initialProjects[0]?.status ?? "active"
+  );
+  const [projectUpdating, setProjectUpdating] = useState(false);
   const [workspaceError, setWorkspaceError] = useState<string | null>(null);
 
   const selectedProject = projects.find((project) => project.id === selectedProjectId);
-  const savedReferences =
-    selectedProject?.collections.find((collection) => collection.name === collectionName)
-      ?.references ?? [];
+  const selectedCollection = selectedProject?.collections.find(
+    (collection) => collection.id === selectedCollectionId
+  );
+  const savedReferences = selectedCollection?.references ?? [];
+
+  const replaceProject = (project: ResearchProject) => {
+    setProjects((current) =>
+      current.map((item) => (item.id === project.id ? project : item))
+    );
+  };
+
+  useEffect(() => {
+    setActiveProjectName(selectedProject?.name ?? "");
+    setActiveProjectBrief(selectedProject?.brief ?? "");
+    setActiveProjectStatus(selectedProject?.status ?? "active");
+  }, [selectedProject]);
+
+  useEffect(() => {
+    if (!selectedCollection) return;
+    setCollectionName(selectedCollection.name);
+    setCollectionDescription(selectedCollection.description);
+  }, [selectedCollection]);
 
   const createWorkspaceProject = async () => {
     if (!projectName.trim() || projectSaving) return;
@@ -93,7 +130,9 @@ export default function ReferencesSearchShell({
       }
       setProjects((current) => [body.project!, ...current]);
       setSelectedProjectId(body.project.id);
+      setSelectedCollectionId("");
       setCollectionName("Primary references");
+      setCollectionDescription("");
       setProjectName("");
       setProjectBrief("");
     } catch (createError) {
@@ -103,8 +142,142 @@ export default function ReferencesSearchShell({
     }
   };
 
+  const updateActiveProject = async () => {
+    if (!selectedProjectId || !activeProjectName.trim() || projectUpdating) return;
+    setProjectUpdating(true);
+    setWorkspaceError(null);
+    try {
+      const response = await fetch("/api/projects", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedProjectId,
+          name: activeProjectName,
+          brief: activeProjectBrief,
+          status: activeProjectStatus,
+        }),
+      });
+      const body = (await response.json().catch(() => ({}))) as {
+        project?: ResearchProject;
+        error?: string;
+      };
+      if (!response.ok || !body.project) {
+        throw new Error(body.error ?? "Project could not be updated.");
+      }
+      replaceProject(body.project);
+    } catch (updateError) {
+      setWorkspaceError(updateError instanceof Error ? updateError.message : "Project could not be updated.");
+    } finally {
+      setProjectUpdating(false);
+    }
+  };
+
+  const createWorkspaceCollection = async () => {
+    if (!selectedProjectId || !collectionName.trim() || collectionSaving) return;
+    setCollectionSaving(true);
+    setWorkspaceError(null);
+    try {
+      const response = await fetch("/api/collections", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: selectedProjectId,
+          name: collectionName,
+          description: collectionDescription,
+        }),
+      });
+      const body = (await response.json().catch(() => ({}))) as {
+        project?: ResearchProject;
+        error?: string;
+      };
+      if (!response.ok || !body.project) {
+        throw new Error(body.error ?? "Collection could not be created.");
+      }
+      replaceProject(body.project);
+      const created = body.project.collections.find(
+        (collection) => collection.name === collectionName.trim()
+      );
+      setSelectedCollectionId(created?.id ?? "");
+    } catch (createError) {
+      setWorkspaceError(createError instanceof Error ? createError.message : "Collection could not be created.");
+    } finally {
+      setCollectionSaving(false);
+    }
+  };
+
+  const updateActiveCollection = async () => {
+    if (!selectedProjectId || !selectedCollectionId || !collectionName.trim() || collectionSaving) return;
+    setCollectionSaving(true);
+    setWorkspaceError(null);
+    try {
+      const response = await fetch("/api/collections", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: selectedProjectId,
+          collectionId: selectedCollectionId,
+          name: collectionName,
+          description: collectionDescription,
+        }),
+      });
+      const body = (await response.json().catch(() => ({}))) as {
+        project?: ResearchProject;
+        error?: string;
+      };
+      if (!response.ok || !body.project) {
+        throw new Error(body.error ?? "Collection could not be updated.");
+      }
+      replaceProject(body.project);
+    } catch (updateError) {
+      setWorkspaceError(updateError instanceof Error ? updateError.message : "Collection could not be updated.");
+    } finally {
+      setCollectionSaving(false);
+    }
+  };
+
+  const beginNewCollection = () => {
+    setSelectedCollectionId("");
+    setCollectionName("");
+    setCollectionDescription("");
+    setWorkspaceError(null);
+  };
+
+  const deleteActiveCollection = async () => {
+    if (!selectedProjectId || !selectedCollectionId || !selectedCollection) return;
+    if (!window.confirm(`Delete collection “${selectedCollection.name}” and its saved references?`)) return;
+    setCollectionSaving(true);
+    setWorkspaceError(null);
+    try {
+      const response = await fetch("/api/collections", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: selectedProjectId,
+          collectionId: selectedCollectionId,
+        }),
+      });
+      const body = (await response.json().catch(() => ({}))) as {
+        project?: ResearchProject;
+        error?: string;
+      };
+      if (!response.ok || !body.project) {
+        throw new Error(body.error ?? "Collection could not be deleted.");
+      }
+      replaceProject(body.project);
+      const nextCollection = body.project.collections[0];
+      setSelectedCollectionId(nextCollection?.id ?? "");
+      setCollectionName(nextCollection?.name ?? "Primary references");
+      setCollectionDescription(nextCollection?.description ?? "");
+    } catch (deleteError) {
+      setWorkspaceError(deleteError instanceof Error ? deleteError.message : "Collection could not be deleted.");
+    } finally {
+      setCollectionSaving(false);
+    }
+  };
+
   const saveReference = async (reference: VisualReference): Promise<boolean> => {
-    if (!selectedProjectId || !collectionName.trim()) {
+    const targetCollection = selectedCollection?.name ?? collectionName.trim();
+    if (!selectedProjectId || !targetCollection) {
       setWorkspaceError("Create or select a project and enter a collection name first.");
       return false;
     }
@@ -115,7 +288,7 @@ export default function ReferencesSearchShell({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId: selectedProjectId,
-          collection: collectionName,
+          collection: targetCollection,
           reference,
         }),
       });
@@ -126,9 +299,13 @@ export default function ReferencesSearchShell({
       if (!response.ok || !body.project) {
         throw new Error(body.error ?? "Reference could not be saved.");
       }
-      setProjects((current) =>
-        current.map((project) => (project.id === body.project!.id ? body.project! : project))
-      );
+      replaceProject(body.project);
+      const collection = body.project.collections.find((item) => item.name === targetCollection);
+      if (collection) {
+        setSelectedCollectionId(collection.id);
+        setCollectionName(collection.name);
+        setCollectionDescription(collection.description);
+      }
       return true;
     } catch (saveError) {
       setWorkspaceError(saveError instanceof Error ? saveError.message : "Reference could not be saved.");
@@ -137,7 +314,8 @@ export default function ReferencesSearchShell({
   };
 
   const removeReference = async (reference: VisualReference) => {
-    if (!selectedProjectId || !collectionName) return;
+    if (!selectedProjectId || !selectedCollection) return;
+    if (!window.confirm("Remove this reference from the collection?")) return;
     setWorkspaceError(null);
     try {
       const response = await fetch("/api/references", {
@@ -145,7 +323,7 @@ export default function ReferencesSearchShell({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId: selectedProjectId,
-          collection: collectionName,
+          collection: selectedCollection.name,
           referenceId: reference.id,
         }),
       });
@@ -156,11 +334,44 @@ export default function ReferencesSearchShell({
       if (!response.ok || !body.project) {
         throw new Error(body.error ?? "Reference could not be removed.");
       }
-      setProjects((current) =>
-        current.map((project) => (project.id === body.project!.id ? body.project! : project))
-      );
+      replaceProject(body.project);
     } catch (removeError) {
       setWorkspaceError(removeError instanceof Error ? removeError.message : "Reference could not be removed.");
+    }
+  };
+
+  const updateReference = async (
+    reference: SavedReference,
+    update: ReferenceCatalogUpdate
+  ): Promise<boolean> => {
+    if (!selectedProjectId || !selectedCollectionId) return false;
+    setWorkspaceError(null);
+    try {
+      const response = await fetch("/api/references", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: selectedProjectId,
+          collectionId: selectedCollectionId,
+          referenceRecordId: reference.catalog.recordId,
+          notes: update.notes,
+          tags: update.tags,
+          favorite: update.favorite,
+          status: update.status,
+        }),
+      });
+      const body = (await response.json().catch(() => ({}))) as {
+        project?: ResearchProject;
+        error?: string;
+      };
+      if (!response.ok || !body.project) {
+        throw new Error(body.error ?? "Reference details could not be updated.");
+      }
+      replaceProject(body.project);
+      return true;
+    } catch (updateError) {
+      setWorkspaceError(updateError instanceof Error ? updateError.message : "Reference details could not be updated.");
+      return false;
     }
   };
 
@@ -177,7 +388,9 @@ export default function ReferencesSearchShell({
       const remaining = projects.filter((project) => project.id !== selectedProjectId);
       setProjects(remaining);
       setSelectedProjectId(remaining[0]?.id ?? "");
+      setSelectedCollectionId(remaining[0]?.collections[0]?.id ?? "");
       setCollectionName(remaining[0]?.collections[0]?.name ?? "Primary references");
+      setCollectionDescription(remaining[0]?.collections[0]?.description ?? "");
     } catch (deleteError) {
       setWorkspaceError(deleteError instanceof Error ? deleteError.message : "Project could not be deleted.");
     }
@@ -256,58 +469,181 @@ export default function ReferencesSearchShell({
 
   return (
     <div className="space-y-10">
-      <section className="rounded-xl border border-surface-3 bg-surface-1 p-5">
-        <div className="grid gap-5 lg:grid-cols-[1fr_1fr]">
-          <div className="space-y-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">
-                Persistent workspace
-              </p>
-              <h3 className="mt-2 text-xl font-semibold text-text-primary">Project and collection</h3>
-            </div>
-            <label className="block text-sm font-medium text-text-primary" htmlFor="research-project">
-              Active project
-            </label>
-            <select
-              id="research-project"
-              value={selectedProjectId}
-              onChange={(event) => {
-                const projectId = event.target.value;
-                const project = projects.find((item) => item.id === projectId);
-                setSelectedProjectId(projectId);
-                setCollectionName(project?.collections[0]?.name ?? "Primary references");
-              }}
-              className="w-full rounded-md border border-surface-3 bg-surface-0 px-4 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
-            >
-              {projects.length === 0 && <option value="">Create your first project</option>}
-              {projects.map((project) => (
-                <option key={project.id} value={project.id}>{project.name}</option>
-              ))}
-            </select>
-            <label className="block text-sm font-medium text-text-primary" htmlFor="reference-collection">
-              Collection
-            </label>
-            <input
-              id="reference-collection"
-              value={collectionName}
-              maxLength={120}
-              onChange={(event) => setCollectionName(event.target.value)}
-              className="w-full rounded-md border border-surface-3 bg-surface-0 px-4 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
-            />
-            <p className="text-xs leading-5 text-text-tertiary">
-              Saved metadata and original Pinterest links persist in Supabase. Pinterest media files are not copied.
+      <section className="space-y-6 rounded-xl border border-surface-3 bg-surface-1 p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">
+              Persistent workspace
             </p>
-            {selectedProject && (
-              <button
-                type="button"
-                onClick={() => void deleteActiveProject()}
-                className="text-xs text-red-600 underline-offset-4 hover:underline"
-              >
-                Delete active project
-              </button>
-            )}
+            <h3 className="mt-2 text-xl font-semibold text-text-primary">
+              Project and collection
+            </h3>
+            <p className="mt-2 max-w-2xl text-xs leading-5 text-text-tertiary">
+              Notes, tags, workflow state, and original Pinterest links persist in Supabase.
+              Pinterest media files are not copied.
+            </p>
           </div>
-          <div className="space-y-3 border-t border-surface-3 pt-5 lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
+          <a
+            href="/api/export"
+            className="inline-flex w-fit rounded-md border border-surface-3 px-3 py-2 text-xs font-medium text-text-primary hover:border-accent"
+          >
+            Export catalog JSON
+          </a>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-text-primary" htmlFor="research-project">
+                Active project
+              </label>
+              <select
+                id="research-project"
+                value={selectedProjectId}
+                onChange={(event) => {
+                  const projectId = event.target.value;
+                  const project = projects.find((item) => item.id === projectId);
+                  const collection = project?.collections[0];
+                  setSelectedProjectId(projectId);
+                  setSelectedCollectionId(collection?.id ?? "");
+                  setCollectionName(collection?.name ?? "Primary references");
+                  setCollectionDescription(collection?.description ?? "");
+                }}
+                className="w-full rounded-md border border-surface-3 bg-surface-0 px-4 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
+              >
+                {projects.length === 0 && <option value="">Create your first project</option>}
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}{project.status === "archived" ? " — archived" : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {selectedProject && (
+              <details className="rounded-lg border border-surface-3 bg-surface-0 p-4">
+                <summary className="cursor-pointer text-sm font-medium text-text-primary">
+                  Edit active project
+                </summary>
+                <div className="mt-4 space-y-3">
+                  <input
+                    value={activeProjectName}
+                    maxLength={120}
+                    onChange={(event) => setActiveProjectName(event.target.value)}
+                    aria-label="Active project name"
+                    className="w-full rounded-md border border-surface-3 bg-surface-1 px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
+                  />
+                  <textarea
+                    value={activeProjectBrief}
+                    maxLength={2000}
+                    rows={3}
+                    onChange={(event) => setActiveProjectBrief(event.target.value)}
+                    aria-label="Active project brief"
+                    className="w-full resize-y rounded-md border border-surface-3 bg-surface-1 px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
+                  />
+                  <select
+                    value={activeProjectStatus}
+                    onChange={(event) => setActiveProjectStatus(event.target.value as "active" | "archived")}
+                    aria-label="Active project status"
+                    className="w-full rounded-md border border-surface-3 bg-surface-1 px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
+                  >
+                    <option value="active">Active</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => void updateActiveProject()}
+                      disabled={!activeProjectName.trim() || projectUpdating}
+                      className="rounded-md bg-text-primary px-3 py-2 text-xs font-medium text-surface-0 disabled:opacity-50"
+                    >
+                      {projectUpdating ? "Saving…" : "Save project"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void deleteActiveProject()}
+                      className="text-xs text-red-600 underline-offset-4 hover:underline"
+                    >
+                      Delete project
+                    </button>
+                  </div>
+                </div>
+              </details>
+            )}
+
+            <div className="space-y-3 rounded-lg border border-surface-3 bg-surface-0 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-medium text-text-primary">Collection</p>
+                {selectedProject && (
+                  <button
+                    type="button"
+                    onClick={beginNewCollection}
+                    className="text-xs text-accent hover:underline"
+                  >
+                    New collection
+                  </button>
+                )}
+              </div>
+              <select
+                value={selectedCollectionId}
+                disabled={!selectedProject || selectedProject.collections.length === 0}
+                onChange={(event) => {
+                  const collection = selectedProject?.collections.find(
+                    (item) => item.id === event.target.value
+                  );
+                  setSelectedCollectionId(event.target.value);
+                  setCollectionName(collection?.name ?? "");
+                  setCollectionDescription(collection?.description ?? "");
+                }}
+                aria-label="Active collection"
+                className="w-full rounded-md border border-surface-3 bg-surface-1 px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none disabled:opacity-60"
+              >
+                {(!selectedProject || selectedProject.collections.length === 0) && (
+                  <option value="">Create the first collection</option>
+                )}
+                {selectedProject?.collections.map((collection) => (
+                  <option key={collection.id} value={collection.id}>{collection.name}</option>
+                ))}
+              </select>
+              <input
+                id="reference-collection"
+                value={collectionName}
+                maxLength={120}
+                onChange={(event) => setCollectionName(event.target.value)}
+                placeholder="Collection name"
+                className="w-full rounded-md border border-surface-3 bg-surface-1 px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
+              />
+              <textarea
+                value={collectionDescription}
+                maxLength={1000}
+                rows={2}
+                onChange={(event) => setCollectionDescription(event.target.value)}
+                placeholder="Optional purpose or design direction"
+                className="w-full resize-y rounded-md border border-surface-3 bg-surface-1 px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
+              />
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => void (selectedCollectionId ? updateActiveCollection() : createWorkspaceCollection())}
+                  disabled={!selectedProjectId || !collectionName.trim() || collectionSaving}
+                  className="rounded-md bg-text-primary px-3 py-2 text-xs font-medium text-surface-0 disabled:opacity-50"
+                >
+                  {collectionSaving ? "Saving…" : selectedCollectionId ? "Save collection" : "Create collection"}
+                </button>
+                {selectedCollection && (
+                  <button
+                    type="button"
+                    onClick={() => void deleteActiveCollection()}
+                    className="text-xs text-red-600 underline-offset-4 hover:underline"
+                  >
+                    Delete collection
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3 border-t border-surface-3 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
             <p className="text-sm font-medium text-text-primary">New project</p>
             <input
               value={projectName}
@@ -321,7 +657,7 @@ export default function ReferencesSearchShell({
               maxLength={2000}
               onChange={(event) => setProjectBrief(event.target.value)}
               placeholder="Creative brief and visual direction"
-              rows={3}
+              rows={4}
               className="w-full resize-y rounded-md border border-surface-3 bg-surface-0 px-4 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
             />
             <button
@@ -334,7 +670,7 @@ export default function ReferencesSearchShell({
             </button>
           </div>
         </div>
-        {workspaceError && <p className="mt-4 text-sm text-red-600" role="alert">{workspaceError}</p>}
+        {workspaceError && <p className="text-sm text-red-600" role="alert">{workspaceError}</p>}
       </section>
       {isAvailable && (
         <div className="space-y-2">
@@ -470,13 +806,15 @@ export default function ReferencesSearchShell({
             Moodboard
           </h2>
           <p className="max-w-3xl text-sm leading-6 text-text-secondary">
-            References saved to {selectedProject?.name ?? "your project"} / {collectionName || "collection"}{" "}
-            remain available across sessions. Each item keeps attribution and a link to the original Pin.
+            References saved to {selectedProject?.name ?? "your project"} / {(selectedCollection?.name ?? collectionName) || "collection"}{" "}
+            remain available across sessions. Catalog notes and tags are private app data;
+            each item keeps Pinterest attribution and a link to the original Pin.
           </p>
         </div>
-        <MoodboardGrid
+        <SavedReferenceCatalog
           pins={savedReferences}
           labels={moodboardLabels}
+          onUpdate={updateReference}
           onRemove={(reference) => void removeReference(reference)}
         />
       </section>

@@ -15,6 +15,7 @@ export interface Database {
           owner_github_id: string;
           name: string;
           brief: string;
+          status: "active" | "archived";
           created_at: string;
           updated_at: string;
         };
@@ -23,12 +24,14 @@ export interface Database {
           owner_github_id: string;
           name: string;
           brief?: string;
+          status?: "active" | "archived";
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           name?: string;
           brief?: string;
+          status?: "active" | "archived";
           updated_at?: string;
         };
         Relationships: [];
@@ -39,6 +42,8 @@ export interface Database {
           project_id: string;
           owner_github_id: string;
           name: string;
+          description: string;
+          sort_order: number;
           created_at: string;
           updated_at: string;
         };
@@ -47,10 +52,17 @@ export interface Database {
           project_id: string;
           owner_github_id: string;
           name: string;
+          description?: string;
+          sort_order?: number;
           created_at?: string;
           updated_at?: string;
         };
-        Update: { name?: string; updated_at?: string };
+        Update: {
+          name?: string;
+          description?: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
         Relationships: [];
       };
       mdt07_references: {
@@ -63,7 +75,12 @@ export interface Database {
           source_id: string;
           source_url: string;
           reference_data: Json;
+          notes: string;
+          tags: string[];
+          favorite: boolean;
+          workflow_status: "saved" | "shortlisted" | "archived";
           saved_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
@@ -74,9 +91,22 @@ export interface Database {
           source_id: string;
           source_url: string;
           reference_data: Json;
+          notes?: string;
+          tags?: string[];
+          favorite?: boolean;
+          workflow_status?: "saved" | "shortlisted" | "archived";
           saved_at?: string;
+          updated_at?: string;
         };
-        Update: { reference_data?: Json; saved_at?: string };
+        Update: {
+          reference_data?: Json;
+          notes?: string;
+          tags?: string[];
+          favorite?: boolean;
+          workflow_status?: "saved" | "shortlisted" | "archived";
+          saved_at?: string;
+          updated_at?: string;
+        };
         Relationships: [];
       };
       mdt07_pinterest_connections: {
@@ -167,6 +197,13 @@ export interface Database {
           allowed: boolean;
           remaining: number;
           retry_after: number;
+        }[];
+      };
+      mdt07_cleanup_expired_security_state: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          expired_connections: number;
+          expired_rate_limits: number;
         }[];
       };
     };

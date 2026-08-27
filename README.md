@@ -40,7 +40,9 @@ website; connected functionality belongs only on the private Studio deployment.
 - Read-only `boards:read` and `pins:read` access
 - Revocable server-side Pinterest token vault with an opaque HTTP-only session cookie
 - Board Pin retrieval and local relevance ranking against a project brief
-- Supabase-backed projects and reference collections with original Pinterest source links
+- Supabase-backed projects and collections with notes, tags, favorites, workflow status,
+  local filtering, and original Pinterest source links
+- Owner-only JSON catalog export, deletion controls, and security-state maintenance
 - Distributed rate limiting and owner audit events in Supabase
 - Fail-closed deployment modes, mutation origin checks, security headers, and CI
 - No public registration and no shared Pinterest account access
@@ -68,6 +70,8 @@ website; connected functionality belongs only on the private Studio deployment.
 | `/admin` | 404 | Authenticated configuration status |
 | `/api/auth/*` | 404 | Auth.js owner authentication |
 | `/api/pinterest/*` | 404 | Authenticated Pinterest OAuth/API |
+| `/api/projects`, `/api/collections`, `/api/references` | 404 | Owner-only catalog API |
+| `/api/export`, `/api/audit`, `/api/admin/*` | 404 | Owner-only data and operations API |
 | `/api/agent/*` | 404 by default | Optional developer-only API |
 
 ## Local development
