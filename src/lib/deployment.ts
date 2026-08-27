@@ -1,7 +1,7 @@
-export type AppMode = "public" | "studio";
+export type AppMode = "public" | "admin";
 
 export function parseAppMode(value: string | undefined): AppMode {
-  return value?.trim().toLowerCase() === "studio" ? "studio" : "public";
+  return value?.trim().toLowerCase() === "admin" ? "admin" : "public";
 }
 
 function normalizeUrl(value: string): string {
@@ -28,7 +28,7 @@ export const deploymentConfig = {
   appUrl,
   publicUrl,
   isPublic: appMode === "public",
-  isStudio: appMode === "studio",
+  isAdmin: appMode === "admin",
   ownerGithubId: process.env.OWNER_GITHUB_ID?.trim() ?? "",
 } as const;
 
@@ -39,7 +39,7 @@ export function getAppUrl(path = "/"): string {
 
 export function isOwnerAuthConfigured(): boolean {
   return Boolean(
-    deploymentConfig.isStudio &&
+    deploymentConfig.isAdmin &&
       deploymentConfig.ownerGithubId &&
       /^\d+$/.test(deploymentConfig.ownerGithubId) &&
       (process.env.AUTH_SECRET?.trim().length ?? 0) >= 32 &&

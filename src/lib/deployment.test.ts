@@ -9,8 +9,8 @@ describe("parseAppMode", () => {
     expect(parseAppMode("unexpected")).toBe("public");
   });
 
-  it("accepts explicit studio mode", () => {
-    expect(parseAppMode("studio")).toBe("studio");
-    expect(parseAppMode(" STUDIO ")).toBe("studio");
+  it("accepts explicit admin mode", () => {
+    expect(parseAppMode("admin")).toBe("admin");
+    expect(parseAppMode(" ADMIN ")).toBe("admin");
   });
 });

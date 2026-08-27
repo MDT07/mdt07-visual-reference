@@ -2,6 +2,7 @@ import Link from "next/link";
 
 const links = [
   { href: "/", label: "Home" },
+  { href: "/boards", label: "Boards" },
   { href: "/about", label: "About" },
   { href: "/privacy", label: "Privacy Policy" },
   { href: "/terms", label: "Terms of Service" },
@@ -11,7 +12,7 @@ const links = [
 export default function SiteFooter() {
   return (
     <footer className="border-t border-surface-2 bg-surface-1">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-[1fr_auto] md:items-end">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-[1fr_auto] md:items-end lg:px-6">
         <div className="max-w-2xl space-y-3">
           <p className="font-semibold text-text-primary">MDT07 Visual Reference</p>
           <p className="text-sm leading-6 text-text-secondary">

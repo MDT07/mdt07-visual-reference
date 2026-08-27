@@ -19,5 +19,5 @@ secrets, session cookies, or passwords in the report.
 ## Supported version
 
 Security fixes are applied to the latest version on the default branch. Public
-deployments intentionally exclude connected credentials; the private studio is
-restricted to the configured owner identity.
+Public deployments intentionally exclude Pinterest and Auth.js credentials. The
+private administration area is restricted to the configured owner identity.

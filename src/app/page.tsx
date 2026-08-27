@@ -1,109 +1,151 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
+
+import BoardCard from "@/components/boards/BoardCard";
 import { getPublicUrl, siteConfig } from "@/lib/config";
 import { deploymentConfig } from "@/lib/deployment";
+import { listPublicBoards } from "@/lib/store/public-catalog";
+
+const description =
+  "A curated visual reference library for discovering stronger directions for web design and development projects.";
 
 export const metadata: Metadata = {
-  description:
-    "Turn a web-project brief into a focused, temporary visual reference workspace with source-linked Pinterest results.",
+  description,
   alternates: { canonical: getPublicUrl() },
   openGraph: {
     title: "MDT07 Visual Reference",
-    description:
-      "Project-scoped visual research for web design and development, with transient Pinterest references and original-source links.",
+    description,
     url: getPublicUrl(),
   },
 };
 
-export default function HomePage() {
+export const revalidate = 300;
+
+export default async function HomePage() {
+  const boards = await listPublicBoards();
+  const featuredBoards = boards.slice(0, 3);
+  const pinCount = boards.reduce((total, board) => total + board.pinCount, 0);
+
   return (
     <main>
-      <section className="border-b border-surface-2 bg-surface-0">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-[1.25fr_0.75fr] md:items-end md:py-24">
-          <div className="space-y-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand">
-              Visual research for the web
-            </p>
-            <h1 className="max-w-4xl text-4xl font-semibold leading-tight tracking-[-0.04em] text-text-primary sm:text-5xl md:text-6xl">
-              MDT07 Visual Reference
-            </h1>
-            <p className="max-w-3xl text-lg leading-8 text-text-secondary md:text-xl">
-              A project-scoped workspace for discovering and comparing visual
-              references from public boards connected to your Pinterest account while
-              planning an original website or interface.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-surface-2 bg-surface-1 p-6">
-            <p className="text-sm leading-6 text-text-secondary">
-              Built for web designers, developers, and creative teams who want to
-              turn a specific project brief into a focused research session.
-            </p>
+      <section className="relative overflow-hidden border-b border-surface-2 bg-surface-0">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_75%_10%,rgba(163,43,43,0.11),transparent_48%)]" />
+        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:py-28 lg:px-6 lg:py-36">
+          <div className="grid gap-12 lg:grid-cols-[1.3fr_0.7fr] lg:items-end">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">
+                Curated visual research for the web
+              </p>
+              <h1 className="mt-5 max-w-5xl text-5xl font-semibold leading-[0.98] tracking-[-0.06em] text-text-primary sm:text-7xl lg:text-[5.8rem]">
+                Better references.<br />Stronger web ideas.
+              </h1>
+              <p className="mt-7 max-w-3xl text-lg leading-8 text-text-secondary sm:text-xl">
+                MDT07 Visual Reference organizes carefully selected Pinterest references
+                into clear project Boards for web design, development, and art direction.
+              </p>
+              <div className="mt-9 flex flex-wrap gap-3">
+                <Link
+                  href="/boards"
+                  className="inline-flex rounded-full bg-text-primary px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-brand"
+                >
+                  Browse boards
+                </Link>
+                <Link
+                  href="/about"
+                  className="inline-flex rounded-full border border-surface-3 bg-surface-0 px-6 py-3.5 text-sm font-semibold text-text-primary transition hover:border-brand hover:text-brand"
+                >
+                  How it works
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[1.75rem] border border-surface-2 bg-surface-2">
+              <div className="bg-surface-1 p-6">
+                <p className="text-4xl font-semibold tracking-[-0.05em] text-text-primary">{boards.length}</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.14em] text-text-tertiary">Public boards</p>
+              </div>
+              <div className="bg-surface-1 p-6">
+                <p className="text-4xl font-semibold tracking-[-0.05em] text-text-primary">{pinCount}</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.14em] text-text-tertiary">Curated Pins</p>
+              </div>
+              <div className="col-span-2 bg-surface-1 p-6">
+                <p className="text-sm leading-6 text-text-secondary">
+                  Every reference stays linked to its original Pinterest source. The
+                  public library requires no account or Pinterest authorization.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16">
-        <div className="grid gap-8 md:grid-cols-3">
-          <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">01</p>
-            <h2 className="text-xl font-semibold text-text-primary">Find a direction</h2>
-            <p className="leading-7 text-text-secondary">
-              Define the visual style, layout language, art direction, or product
-              presentation needed for one specific web project.
-            </p>
-          </div>
-          <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">02</p>
-            <h2 className="text-xl font-semibold text-text-primary">Explore sources</h2>
-            <p className="leading-7 text-text-secondary">
-              Choose one of the public boards available to your connected Pinterest
-              account, then rank its Pins against a project brief. Every reference links
-              back to its original source on Pinterest.
-            </p>
-          </div>
-          <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">03</p>
-            <h2 className="text-xl font-semibold text-text-primary">Curate references</h2>
-            <p className="leading-7 text-text-secondary">
-              Compare selected references in a temporary session workspace, then use
-              the research to make original design decisions.
-            </p>
-          </div>
-        </div>
-        <p className="mt-10 max-w-4xl border-l-2 border-brand pl-5 text-sm leading-6 text-text-tertiary">
-          The application helps organize visual research. It does not automatically
-          copy Pinterest content or transfer ownership of it. Pinterest remains the
-          source for the referenced Pins.
-        </p>
-        <p className="mt-5 max-w-4xl text-sm leading-6 text-text-tertiary">
-          This is not a replacement client for Pinterest. The added workflow is scoped
-          to a web-project brief, keeps selections only for the open session, and helps
-          designers compare references before creating their own work.
-        </p>
-      </section>
-
-      <section className="border-y border-surface-2 bg-surface-0">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 md:grid-cols-[1fr_auto] md:items-center">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:py-24 lg:px-6">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand">
-              Access model
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">
+              Latest collections
             </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-text-primary">
-              Public information, private connected workspace
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-text-primary sm:text-5xl">
+              Explore the catalog
+            </h2>
+          </div>
+          <Link href="/boards" className="text-sm font-semibold text-text-primary hover:text-brand">
+            View all boards <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+
+        {featuredBoards.length ? (
+          <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {featuredBoards.map((board) => (
+              <BoardCard key={board.id} board={board} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-10 rounded-[2rem] border border-dashed border-surface-3 bg-surface-0 px-6 py-16 text-center">
+            <h3 className="text-xl font-semibold text-text-primary">The first collection is being curated</h3>
+            <p className="mx-auto mt-3 max-w-xl leading-7 text-text-secondary">
+              The catalog structure is live. Active project collections will appear here
+              as soon as references are published from the private admin area.
+            </p>
+          </div>
+        )}
+      </section>
+
+      <section className="border-y border-surface-2 bg-text-primary text-white">
+        <div className="mx-auto grid max-w-7xl gap-px bg-white/10 lg:grid-cols-3">
+          {[
+            ["01", "Start with intent", "Define the visual problem: a hero, editorial layout, interface system, motion language, or complete project direction."],
+            ["02", "Study curated references", "Open a focused Board and compare all its Pins without losing the project context or original source."],
+            ["03", "Create original work", "Translate patterns, principles, and atmosphere into an original website rather than copying a finished design."],
+          ].map(([number, title, text]) => (
+            <article key={number} className="bg-text-primary px-6 py-12 sm:px-10">
+              <p className="text-xs font-semibold tracking-[0.18em] text-red-300">{number}</p>
+              <h3 className="mt-5 text-2xl font-semibold tracking-tight">{title}</h3>
+              <p className="mt-4 leading-7 text-white/65">{text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-surface-1">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-16 md:grid-cols-[1fr_auto] md:items-center lg:px-6">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">Access model</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-text-primary">
+              Open catalog. Private management.
             </h2>
             <p className="mt-4 max-w-3xl leading-7 text-text-secondary">
-              The public website explains the project and keeps its legal pages openly
-              available. Pinterest OAuth, tokens, and connected research tools are
-              isolated to an owner-authorized studio deployment.
+              Anyone can browse published Boards and Pins. Pinterest OAuth, catalog edits,
+              tokens, and synchronization remain isolated behind owner-only GitHub authentication.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            {deploymentConfig.isStudio && (
+            {deploymentConfig.isAdmin && (
               <Link
-                href="/studio"
+                href="/admin"
                 className="inline-flex rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white hover:bg-brand-hover"
               >
-                Open owner studio
+                Open admin
               </Link>
             )}
             <a
@@ -118,12 +160,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-t border-surface-2 bg-surface-1">
-        <div className="mx-auto max-w-6xl px-4 py-12">
-          <p className="max-w-4xl text-sm leading-6 text-text-secondary">
-            MDT07 Visual Reference is an independent application. It is not
-            endorsed by, affiliated with, or an official product of Pinterest.
-          </p>
+      <section className="border-t border-surface-2 bg-surface-0">
+        <div className="mx-auto max-w-7xl px-4 py-10 text-sm leading-6 text-text-tertiary lg:px-6">
+          MDT07 Visual Reference is an independent application. It is not endorsed by,
+          affiliated with, or an official product of Pinterest.
         </div>
       </section>
     </main>

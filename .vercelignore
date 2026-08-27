@@ -1,1 +1,5 @@
 artifacts/
+.gitnexus/
+.claude/
+AGENTS.md
+CLAUDE.md

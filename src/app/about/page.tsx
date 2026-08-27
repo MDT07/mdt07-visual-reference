@@ -3,7 +3,7 @@ import PageIntro from "@/components/site/PageIntro";
 import { getPublicUrl } from "@/lib/config";
 
 const description =
-  "Learn how MDT07 Visual Reference turns a web-project brief into a focused, source-linked visual research session.";
+  "Learn how MDT07 Visual Reference organizes source-linked Pinterest references into focused Boards for original web projects.";
 
 export const metadata: Metadata = {
   title: "About",
@@ -25,7 +25,7 @@ const workflow = [
   {
     number: "02",
     title: "Find relevant references",
-    text: "The application lists public boards available to your connected Pinterest account, retrieves Pins from the board you select, and ranks them against the project brief.",
+    text: "Browse a curated project Board and see every saved reference in one clear, source-linked collection.",
   },
   {
     number: "03",
@@ -45,7 +45,7 @@ export default function AboutPage() {
       <PageIntro
         eyebrow="About the project"
         title="A clearer path from research to web design"
-        description="MDT07 Visual Reference is designed for finding and studying source-linked visual references that can inform an original website or interface."
+        description="MDT07 Visual Reference is a public catalog of curated, source-linked visual references for planning original websites and interfaces."
       />
 
       <section className="grid gap-8 py-12 md:grid-cols-2">
@@ -55,8 +55,8 @@ export default function AboutPage() {
           </h2>
           <p className="leading-7 text-text-secondary">
             Visual research often gets scattered across tabs, links, and disconnected
-            screenshots. This tool starts with one web-project brief and creates a
-            focused, temporary workspace for comparing useful directions.
+            screenshots. This tool organizes selected references into project Boards,
+            making each visual direction easier to explore and revisit.
           </p>
         </div>
         <div className="space-y-4">

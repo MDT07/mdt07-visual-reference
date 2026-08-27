@@ -17,7 +17,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const redirectUrl = new URL(getAppUrl("/studio"));
+  const redirectUrl = new URL(getAppUrl("/admin"));
   redirectUrl.searchParams.set("oauth", "disconnected");
   const response = NextResponse.redirect(redirectUrl, 303);
   response.headers.set("Cache-Control", "no-store, max-age=0");

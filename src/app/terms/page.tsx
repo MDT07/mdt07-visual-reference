@@ -1,19 +1,16 @@
 import type { Metadata } from "next";
+
 import PageIntro from "@/components/site/PageIntro";
 import { getPublicUrl, siteConfig } from "@/lib/config";
 
 const description =
-  "Terms of Service for using MDT07 Visual Reference and its Pinterest-connected visual research features.";
+  "Terms of Service for the MDT07 Visual Reference public catalog and owner-only Pinterest-connected administration features.";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
   description,
   alternates: { canonical: getPublicUrl("/terms") },
-  openGraph: {
-    title: "Terms of Service",
-    description,
-    url: getPublicUrl("/terms"),
-  },
+  openGraph: { title: "Terms of Service", description, url: getPublicUrl("/terms") },
 };
 
 export default function TermsPage() {
@@ -22,30 +19,30 @@ export default function TermsPage() {
       <PageIntro
         eyebrow="Legal"
         title="Terms of Service"
-        description="These terms describe the permitted use of MDT07 Visual Reference and its Pinterest-connected features."
+        description="The permitted use of MDT07 Visual Reference, its public catalog, and its Pinterest-connected owner features."
       />
 
       <div className="legal-content py-12">
-        <p><strong>Last updated:</strong> August 27, 2026</p>
+        <p><strong>Last updated:</strong> August 28, 2026</p>
 
         <section>
-          <h2>1. Purpose of the Application</h2>
+          <h2>1. Purpose</h2>
           <p>
-            MDT07 Visual Reference (the “Application”) is an independent,
-            project-scoped visual research workspace for web design and development.
-            It may use owner-selected, source-linked Pinterest references to support research
-            and the creation of original work. It is not a replacement Pinterest client,
-            an official Pinterest product, or endorsed by or affiliated with Pinterest.
+            MDT07 Visual Reference (the “Application”) is an independent visual research
+            catalog for web design and development. It organizes owner-selected,
+            source-linked Pinterest references into project Boards to support study and
+            original work. It is not an official Pinterest product, a replacement
+            Pinterest client, or endorsed by or affiliated with Pinterest.
           </p>
         </section>
 
         <section>
           <h2>2. Acceptance and permitted use</h2>
           <p>
-            By using the Application, you agree to these Terms. You may use it for
-            lawful visual research, reference organization, and related design or
-            development work. You must comply with applicable laws, Pinterest’s terms
-            and policies, and the rights attached to any content you view.
+            By using the Application, you agree to these Terms. You may browse its public
+            catalog and use it for lawful visual research, reference organization, and
+            related design or development work. You must comply with applicable law,
+            Pinterest&apos;s terms and policies, and the rights attached to content you view.
           </p>
           <p>The Application is not intended for children under 13.</p>
         </section>
@@ -54,11 +51,11 @@ export default function TermsPage() {
           <h2>3. Prohibited use</h2>
           <p>You must not:</p>
           <ul>
-            <li>Use the Application to infringe copyright, trademark, privacy, or other rights.</li>
+            <li>Infringe copyright, trademark, privacy, or other rights.</li>
             <li>Misrepresent third-party content as your own or remove source attribution.</li>
-            <li>Attempt to bypass Pinterest permissions, rate limits, or access controls.</li>
-            <li>Probe, disrupt, overload, or gain unauthorized access to the Application or its connected services.</li>
-            <li>Extract or use Pinterest data in a way prohibited by Pinterest’s developer terms or policies.</li>
+            <li>Bypass authentication, Pinterest permissions, rate limits, or access controls.</li>
+            <li>Probe, disrupt, overload, scrape, or gain unauthorized access to the Application.</li>
+            <li>Extract or use Pinterest data contrary to Pinterest&apos;s developer rules.</li>
             <li>Use the Application for unlawful, deceptive, or harmful activity.</li>
           </ul>
         </section>
@@ -66,51 +63,45 @@ export default function TermsPage() {
         <section>
           <h2>4. Access controls</h2>
           <p>
-            The public website provides project and legal information. Connected
-            Pinterest features are restricted to a private studio and its configured
-            owner account. You must not bypass authentication, use another person&apos;s
-            session, reuse private credentials, or attempt to promote your own access.
-            Public availability of the source repository does not grant access to the
-            maintainer&apos;s hosted private studio or Pinterest credentials.
+            Public Boards and Pins are read-only and require no registration. Pinterest
+            OAuth, synchronization, project changes, and catalog management are restricted
+            to a private administration area and its configured owner. Public source code
+            does not grant access to the hosted administration area, its Pinterest account,
+            sessions, credentials, or data-management endpoints.
           </p>
         </section>
 
         <section>
-          <h2>5. Your responsibilities</h2>
+          <h2>5. User responsibility and third-party content</h2>
           <p>
-            You are responsible for the search terms you submit, references you select,
-            and any work you create from your research. A Pin being visible through the
-            Application does not grant permission to copy, publish, sell, or otherwise
-            reuse it. You must obtain any rights or licenses required for your intended
-            use and verify that your final work does not infringe another party’s rights.
+            You are responsible for how you use ideas found through the catalog and for
+            work you create from your research. Visibility of a Pin does not grant a
+            license to copy, publish, sell, or reuse it. You must obtain any permission
+            required for your intended use and independently verify that your work does not infringe rights.
           </p>
         </section>
 
         <section>
-          <h2>6. Pinterest and other third-party services</h2>
+          <h2>6. Pinterest and other services</h2>
           <p>
-            Connected features depend on Pinterest OAuth and the Pinterest API. Your
-            use of Pinterest remains subject to Pinterest’s own terms, privacy policy,
-            developer rules, and availability. Pinterest may change permissions,
-            endpoints, limits, or access at any time, which may cause Application
-            features to change or stop working.
+            Owner features depend on Pinterest OAuth and the Pinterest API. Pinterest may
+            change permissions, endpoints, limits, content, or availability, which may
+            cause features or references to change or stop working. Pinterest use remains
+            subject to Pinterest&apos;s own terms, privacy policy, and developer requirements.
           </p>
           <p>
-            The Application may also depend on a hosting provider and may link to
-            external websites. Those services are controlled by their respective
-            providers, not by this Application.
+            The Application also relies on GitHub, Supabase, Vercel, and links to external
+            sites. Those services are controlled by their respective providers.
           </p>
         </section>
 
         <section>
           <h2>7. Intellectual property</h2>
           <p>
-            The Application’s original code, interface, and branding remain the
-            property of their respective owner, subject to any license included with
-            the source code. Pinterest, its name, marks, API, and Pinterest content
-            belong to Pinterest or the relevant rights holders. These Terms do not
-            transfer ownership of Pinterest content or other third-party material to
-            you or to the Application.
+            The Application&apos;s original code, interface, and branding remain the property
+            of their respective owner, subject to any repository license. Pinterest, its
+            marks, API, and Pinterest content belong to Pinterest or the relevant rights
+            holders. These Terms transfer no ownership of third-party content.
           </p>
         </section>
 
@@ -118,65 +109,48 @@ export default function TermsPage() {
           <h2>8. Availability and changes</h2>
           <p>
             The Application is provided on an “as available” basis. Features may be
-            corrected, limited, suspended, or changed, including to comply with
-            Pinterest requirements, protect security, or account for API changes. There
-            is no promise that every Pin, board, search result, or saved reference will
-            remain available.
+            corrected, limited, suspended, or changed for security, maintenance,
+            compliance, or API changes. No promise is made that every Board, Pin, remote
+            image, source link, or saved reference will remain available.
           </p>
         </section>
 
         <section>
-          <h2>9. AI-assisted research</h2>
+          <h2>9. Disclaimers and limitation of liability</h2>
           <p>
-            Optional AI analysis produces research suggestions from the app-owned fields
-            the private-studio owner previews and confirms. AI output may be incomplete,
-            inaccurate, or unsuitable for a particular project and must be independently
-            reviewed. It does not establish ownership, licensing rights, originality, or
-            legal permission to use third-party material. The AI layer has no Pinterest
-            write permission and does not automatically change projects or saved references.
+            To the extent permitted by law, the Application is provided without warranties
+            of uninterrupted operation, accuracy, fitness for a particular purpose, or
+            non-infringement. References and third-party content must be independently evaluated.
+          </p>
+          <p>
+            To the extent permitted by law, the maintainer is not liable for indirect,
+            incidental, special, consequential, or punitive losses, or losses caused by
+            third-party content, API availability, unauthorized use, missing references,
+            or decisions based on the catalog. Nothing excludes liability that cannot legally be excluded.
           </p>
         </section>
 
         <section>
-          <h2>10. Disclaimers and limitation of liability</h2>
+          <h2>10. Termination</h2>
           <p>
-            To the extent permitted by applicable law, the Application is provided
-            without warranties of uninterrupted operation, accuracy, fitness for a
-            particular purpose, or non-infringement. Search results and third-party
-            content are supplied for reference and should be independently evaluated.
-          </p>
-          <p>
-            To the extent permitted by law, the Application’s maintainer will not be
-            liable for indirect, incidental, special, consequential, or punitive losses,
-            or for losses caused by third-party content, Pinterest API availability,
-            unauthorized use, lost references, or decisions based on search results.
-            Nothing in these Terms excludes liability that cannot legally be excluded.
+            You may stop using the Application at any time. Access may be limited or
+            terminated to address abuse, security risks, legal duties, Pinterest policy
+            requirements, or material violations of these Terms. The owner may revoke Pinterest access at any time.
           </p>
         </section>
 
         <section>
-          <h2>11. Suspension or termination</h2>
+          <h2>11. Changes to these Terms</h2>
           <p>
-            You may stop using the Application at any time and may revoke Pinterest
-            access through Pinterest. Access may be limited or terminated when necessary
-            to address abuse, security risks, legal obligations, Pinterest policy
-            requirements, or material violations of these Terms.
-          </p>
-        </section>
-
-        <section>
-          <h2>12. Changes to these Terms</h2>
-          <p>
-            These Terms may be updated as the Application or its connected services
-            evolve. Updates will be published at this URL with a revised “Last updated”
+            Updated Terms will be published at this URL with a revised “Last updated”
             date. Continued use after an update means you accept the revised Terms.
           </p>
         </section>
 
         <section>
-          <h2>13. Contact</h2>
+          <h2>12. Contact</h2>
           <p>
-            Questions about these Terms may be sent to
+            Questions may be sent to
             <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>.
           </p>
         </section>

@@ -14,7 +14,7 @@ export function isOwnerSession(
   session: Session | null | undefined
 ): session is Session {
   return matchesOwnerAccess(session?.user, {
-    isStudio: deploymentConfig.isStudio,
+    isAdmin: deploymentConfig.isAdmin,
     ownerGithubId: deploymentConfig.ownerGithubId,
   });
 }
@@ -26,7 +26,7 @@ export async function getOwnerSession(): Promise<Session | null> {
 }
 
 export async function requireOwnerApi(): Promise<NextResponse | null> {
-  if (!deploymentConfig.isStudio) {
+  if (!deploymentConfig.isAdmin) {
     return NextResponse.json(
       { error: "Not found" },
       { status: 404, headers: { "Cache-Control": "no-store" } }

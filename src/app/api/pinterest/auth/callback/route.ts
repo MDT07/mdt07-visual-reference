@@ -42,7 +42,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const tokens = await exchangeCode(code);
     const session = createPinterestSession(tokens);
 
-    const redirectUrl = new URL(getAppUrl("/studio"));
+    const redirectUrl = new URL(getAppUrl("/admin"));
     redirectUrl.searchParams.set("oauth", "success");
     const response = NextResponse.redirect(redirectUrl.toString());
     response.headers.set("Cache-Control", "no-store, max-age=0");

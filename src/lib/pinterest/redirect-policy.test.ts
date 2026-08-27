@@ -6,8 +6,8 @@ describe("isValidPinterestRedirectUri", () => {
   it("accepts the exact HTTPS callback on the application origin", () => {
     expect(
       isValidPinterestRedirectUri(
-        "https://studio.example.com/api/pinterest/auth/callback",
-        "https://studio.example.com"
+        "https://admin.example.com/api/pinterest/auth/callback",
+        "https://admin.example.com"
       )
     ).toBe(true);
   });
@@ -25,7 +25,7 @@ describe("isValidPinterestRedirectUri", () => {
     expect(
       isValidPinterestRedirectUri(
         "https://public.example.com/api/pinterest/auth/callback",
-        "https://studio.example.com"
+        "https://admin.example.com"
       )
     ).toBe(false);
   });
@@ -33,20 +33,20 @@ describe("isValidPinterestRedirectUri", () => {
   it("rejects the wrong path, a trailing slash, or query parameters", () => {
     expect(
       isValidPinterestRedirectUri(
-        "https://studio.example.com/api/pinterest/auth",
-        "https://studio.example.com"
+        "https://admin.example.com/api/pinterest/auth",
+        "https://admin.example.com"
       )
     ).toBe(false);
     expect(
       isValidPinterestRedirectUri(
-        "https://studio.example.com/api/pinterest/auth/callback/",
-        "https://studio.example.com"
+        "https://admin.example.com/api/pinterest/auth/callback/",
+        "https://admin.example.com"
       )
     ).toBe(false);
     expect(
       isValidPinterestRedirectUri(
-        "https://studio.example.com/api/pinterest/auth/callback?source=test",
-        "https://studio.example.com"
+        "https://admin.example.com/api/pinterest/auth/callback?source=test",
+        "https://admin.example.com"
       )
     ).toBe(false);
   });
@@ -54,11 +54,11 @@ describe("isValidPinterestRedirectUri", () => {
   it("rejects insecure non-localhost callbacks and malformed URLs", () => {
     expect(
       isValidPinterestRedirectUri(
-        "http://studio.example.com/api/pinterest/auth/callback",
-        "http://studio.example.com"
+        "http://admin.example.com/api/pinterest/auth/callback",
+        "http://admin.example.com"
       )
     ).toBe(false);
-    expect(isValidPinterestRedirectUri("not-a-url", "https://studio.example.com")).toBe(
+    expect(isValidPinterestRedirectUri("not-a-url", "https://admin.example.com")).toBe(
       false
     );
   });

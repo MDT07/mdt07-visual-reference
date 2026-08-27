@@ -2,21 +2,13 @@
 
 Status: Accepted
 
-## Current boundary
-
 - Request only `boards:read` and `pins:read`.
-- Fetch boards and Pins live for the authenticated owner.
-- Persist only references the owner explicitly saves, with their original Pin links.
+- Fetch public Boards and Pins only for the authenticated owner.
+- Persist only references the owner explicitly saves.
+- Publish only sanitized active catalog records with Pinterest attribution and links.
 - Do not copy Pinterest media binaries into application storage.
-- Preserve Pinterest attribution and original Pin links.
-- Do not scrape, train models on Pinterest material, or send API content to an
-  external AI provider.
+- Do not scrape, train models on Pinterest material, call external AI providers, or
+  perform Pinterest write actions.
 
-## Future write boundary
-
-`boards:write` and `pins:write` may be requested only after the matching UI exists.
-Every create/save operation requires a specific owner preview and confirmation.
-Agents may propose an action but cannot execute it without a short-lived approval.
-
-Material data-practice changes require updated public Privacy Policy and Terms
-before production deployment.
+Any future write integration requires separate product design, explicit owner
+confirmation, updated scopes, security review, and updated public legal pages before deployment.

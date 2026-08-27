@@ -20,7 +20,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   },
   callbacks: {
     signIn({ account, profile }) {
-      if (!deploymentConfig.isStudio || account?.provider !== "github") {
+      if (!deploymentConfig.isAdmin || account?.provider !== "github") {
         return false;
       }
 

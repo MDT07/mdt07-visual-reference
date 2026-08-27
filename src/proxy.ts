@@ -13,7 +13,7 @@ type ProxyHandler = (
 const authenticatedOwnerProxy = auth((request) => {
   if (
     !matchesOwnerAccess(request.auth?.user, {
-      isStudio: deploymentConfig.isStudio,
+      isAdmin: deploymentConfig.isAdmin,
       ownerGithubId: deploymentConfig.ownerGithubId,
     })
   ) {
@@ -26,7 +26,7 @@ const authenticatedOwnerProxy = auth((request) => {
 }) as unknown as ProxyHandler;
 
 export default function proxy(request: NextRequest, event: NextFetchEvent) {
-  if (!deploymentConfig.isStudio) {
+  if (!deploymentConfig.isAdmin) {
     return NextResponse.rewrite(new URL("/_not-found", request.url), {
       status: 404,
     });
@@ -42,5 +42,5 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
 }
 
 export const config = {
-  matcher: ["/studio/:path*", "/admin/:path*"],
+  matcher: ["/admin/:path*"],
 };

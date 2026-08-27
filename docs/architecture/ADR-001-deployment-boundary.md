@@ -1,28 +1,22 @@
-# ADR-001: Public website and private studio deployments
+# ADR-001: Public catalog and private administration deployments
 
 Status: Accepted
 
 ## Decision
 
-Use two Vercel projects connected to the same Git repository.
+Run the same Next.js repository as two Vercel deployments:
 
-- `APP_MODE=public` serves the public product and legal pages. It must not receive
-  Pinterest, Auth.js, database, or agent credentials. Private routes return 404.
-- `APP_MODE=studio` serves the owner workspace, owner control surface, Auth.js,
-  Pinterest OAuth, and protected APIs.
+- `APP_MODE=public` serves the website, legal pages, public Boards, and sanitized
+  Pin metadata. It does not enable Auth.js or Pinterest routes.
+- `APP_MODE=admin` serves owner authentication, Pinterest OAuth/API, catalog
+  mutations, export, maintenance, and audit controls.
 
-`PUBLIC_SITE_URL` is the canonical public website. `APP_URL` is the current
-deployment origin and is used for same-origin checks and private redirects.
-
-## Why
-
-The public Pinterest review website must remain accessible while connected
-credentials and tools need an independent owner-only security boundary. Keeping
-one repository preserves reuse without sharing environment configuration.
+Unknown mode values resolve to `public`. Owner-only pages and APIs fail closed outside
+admin mode. The public server reads only the sanitized `/api/public/boards` endpoint
+from the private backend and has no Supabase credential.
 
 ## Consequences
 
-- The private production URL must be known before registering its exact Pinterest
-  redirect URI.
-- Preview deployments must not inherit production credentials.
-- Public and private deployments require separate smoke tests.
+The public and private hosts require separate environment configuration. Pinterest and
+Auth.js credentials exist only on the private host. A private-host rename requires
+coordinated GitHub OAuth and Pinterest redirect URI updates.

@@ -5,10 +5,10 @@ import { matchesOwnerAccess } from "./access-policy";
 const owner = { githubId: "172265857", role: "OWNER" };
 
 describe("matchesOwnerAccess", () => {
-  it("allows only the configured owner in studio mode", () => {
+  it("allows only the configured owner in admin mode", () => {
     expect(
       matchesOwnerAccess(owner, {
-        isStudio: true,
+        isAdmin: true,
         ownerGithubId: "172265857",
       })
     ).toBe(true);
@@ -17,7 +17,7 @@ describe("matchesOwnerAccess", () => {
   it("rejects owner identity in public mode", () => {
     expect(
       matchesOwnerAccess(owner, {
-        isStudio: false,
+        isAdmin: false,
         ownerGithubId: "172265857",
       })
     ).toBe(false);
@@ -27,20 +27,20 @@ describe("matchesOwnerAccess", () => {
     expect(
       matchesOwnerAccess(
         { githubId: "1", role: "OWNER" },
-        { isStudio: true, ownerGithubId: "172265857" }
+        { isAdmin: true, ownerGithubId: "172265857" }
       )
     ).toBe(false);
     expect(
       matchesOwnerAccess(
         { githubId: "172265857", role: "UNAUTHORIZED" },
-        { isStudio: true, ownerGithubId: "172265857" }
+        { isAdmin: true, ownerGithubId: "172265857" }
       )
     ).toBe(false);
   });
 
   it("fails closed when owner configuration is missing", () => {
     expect(
-      matchesOwnerAccess(owner, { isStudio: true, ownerGithubId: "" })
+      matchesOwnerAccess(owner, { isAdmin: true, ownerGithubId: "" })
     ).toBe(false);
   });
 });

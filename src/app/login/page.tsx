@@ -14,10 +14,10 @@ export const metadata: Metadata = {
 };
 
 export default async function LoginPage() {
-  if (!deploymentConfig.isStudio) notFound();
+  if (!deploymentConfig.isAdmin) notFound();
 
   const ownerSession = await getOwnerSession();
-  if (ownerSession) redirect("/studio");
+  if (ownerSession) redirect("/admin");
 
   const configured = isOwnerAuthConfigured();
 
@@ -28,7 +28,7 @@ export default async function LoginPage() {
           Private owner access
         </p>
         <h1 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-text-primary">
-          MDT07 Studio
+          MDT07 Admin
         </h1>
         <p className="mt-4 leading-7 text-text-secondary">
           This workspace is restricted to the configured MDT07 GitHub owner.
@@ -41,7 +41,7 @@ export default async function LoginPage() {
             className="mt-8"
             action={async () => {
               "use server";
-              await signIn("github", { redirectTo: "/studio" });
+              await signIn("github", { redirectTo: "/admin" });
             }}
           >
             <button
@@ -55,7 +55,7 @@ export default async function LoginPage() {
           <div className="mt-8 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
             Owner authentication is not configured for this deployment. Add the
             private Auth.js and GitHub OAuth environment variables before enabling
-            studio access.
+            admin access.
           </div>
         )}
       </section>

@@ -4,7 +4,7 @@ import { handlers } from "@/auth";
 import { deploymentConfig, isOwnerAuthConfigured } from "@/lib/deployment";
 
 function configurationError(): NextResponse | null {
-  if (!deploymentConfig.isStudio) {
+  if (!deploymentConfig.isAdmin) {
     return NextResponse.json(
       { error: "Not found" },
       { status: 404, headers: { "Cache-Control": "no-store" } }

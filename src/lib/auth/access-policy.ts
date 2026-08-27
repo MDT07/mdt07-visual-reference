@@ -5,10 +5,10 @@ export interface OwnerIdentity {
 
 export function matchesOwnerAccess(
   identity: OwnerIdentity | null | undefined,
-  options: { isStudio: boolean; ownerGithubId: string }
+  options: { isAdmin: boolean; ownerGithubId: string }
 ): boolean {
   return Boolean(
-    options.isStudio &&
+    options.isAdmin &&
       options.ownerGithubId &&
       identity?.role === "OWNER" &&
       identity.githubId === options.ownerGithubId
