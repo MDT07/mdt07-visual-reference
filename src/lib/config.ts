@@ -36,6 +36,20 @@ export const agentApiConfig = {
   apiKey: process.env.AGENT_API_KEY ?? "",
 } as const;
 
+export const aiCatalogConfig = {
+  enabled:
+    deploymentConfig.isStudio && process.env.AI_CATALOG_ENABLED === "true",
+  apiKey: process.env.OPENAI_API_KEY?.trim() ?? "",
+  model: process.env.OPENAI_MODEL?.trim() || "gpt-5.4-mini",
+  maxReferences: Math.max(
+    1,
+    Math.min(100, Number(process.env.AI_CATALOG_MAX_REFERENCES ?? 50) || 50)
+  ),
+} as const;
+
+export const isAiCatalogConfigured = (): boolean =>
+  Boolean(aiCatalogConfig.enabled && aiCatalogConfig.apiKey.length >= 20);
+
 export const isPinterestConfigured = (): boolean =>
   Boolean(
       deploymentConfig.isStudio &&

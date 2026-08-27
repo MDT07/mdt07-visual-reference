@@ -12,6 +12,12 @@ public boards available to the connected owner, retrieves Pins from the selected
 board through Pinterest API v5, and ranks them locally against a project brief. It
 does not claim global Pinterest search or write access.
 
+The optional AI catalog analysis does not call Pinterest, inspect Pinterest media or
+metadata, or require additional Pinterest scopes. Its separate allowlisted payload
+contains only owner-authored project and catalog fields after an exact preview and
+one-request confirmation. AI output is read-only and cannot trigger Pinterest or
+catalog mutations.
+
 ## Authentication sequence
 
 ```text

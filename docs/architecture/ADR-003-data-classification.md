@@ -8,6 +8,8 @@ Status: Accepted
 | Owner identity | GitHub ID, role, application session | Minimum necessary retention |
 | App-owned | Project brief, collections, notes, tags, favorites, workflow status | May be persisted with deletion and export controls |
 | Pinterest API | Boards, Pins, media URLs, source metadata | Live `no-store`; do not persist without express permission |
+| AI outbound | Explicitly previewed allowlist of app-owned fields | One confirmed server request, `store=false`; never persist the raw payload |
+| AI derived | Structured report, usage counts, input fingerprint | Owner-only Supabase record; deleted by project cascade |
 | Security | Denials, rate limits, audit event metadata | Redacted, bounded retention |
 
 The browser must never receive the Pinterest App Secret or any plaintext token in
@@ -24,3 +26,8 @@ removed through the owner-only maintenance endpoint. This cleanup never deletes
 projects, collections, saved references, or owner-authored annotations. Audit event
 payloads are limited to action metadata and must not contain credentials or plaintext
 tokens.
+
+AI execution is available only in the owner-authenticated Studio. The server rebuilds
+the allowlisted payload after confirmation and rejects it if its SHA-256 fingerprint
+no longer matches the reviewed preview. AI reports are separate derived records and
+cannot mutate the catalog or initiate Pinterest actions.

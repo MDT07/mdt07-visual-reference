@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import OwnerDataActions from "@/components/admin/OwnerDataActions";
 import OwnerSignOut from "@/components/auth/OwnerSignOut";
 import { getOwnerSession } from "@/lib/auth/authorization";
-import { isPinterestConfigured } from "@/lib/config";
+import { isAiCatalogConfigured, isPinterestConfigured } from "@/lib/config";
 import { deploymentConfig, isOwnerAuthConfigured } from "@/lib/deployment";
 import { getPinterestSessionFromCookies } from "@/lib/pinterest/session";
 import { listAuditEvents } from "@/lib/store/projects";
@@ -38,6 +38,8 @@ export default async function AdminPage() {
     ],
     ["Pinterest browser connection", pinterestConnected ? "connected" : "disconnected"],
     ["Pinterest access", "boards:read, pins:read"],
+    ["AI catalog analysis", isAiCatalogConfigured() ? "configured" : "disabled or missing key"],
+    ["AI external actions", "none — no tools or write access"],
   ];
 
   return (

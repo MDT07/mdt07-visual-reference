@@ -126,7 +126,19 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>9. Disclaimers and limitation of liability</h2>
+          <h2>9. AI-assisted research</h2>
+          <p>
+            Optional AI analysis produces research suggestions from the app-owned fields
+            the private-studio owner previews and confirms. AI output may be incomplete,
+            inaccurate, or unsuitable for a particular project and must be independently
+            reviewed. It does not establish ownership, licensing rights, originality, or
+            legal permission to use third-party material. The AI layer has no Pinterest
+            write permission and does not automatically change projects or saved references.
+          </p>
+        </section>
+
+        <section>
+          <h2>10. Disclaimers and limitation of liability</h2>
           <p>
             To the extent permitted by applicable law, the Application is provided
             without warranties of uninterrupted operation, accuracy, fitness for a
@@ -143,7 +155,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>10. Suspension or termination</h2>
+          <h2>11. Suspension or termination</h2>
           <p>
             You may stop using the Application at any time and may revoke Pinterest
             access through Pinterest. Access may be limited or terminated when necessary
@@ -153,7 +165,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>11. Changes to these Terms</h2>
+          <h2>12. Changes to these Terms</h2>
           <p>
             These Terms may be updated as the Application or its connected services
             evolve. Updates will be published at this URL with a revised “Last updated”
@@ -162,7 +174,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>12. Contact</h2>
+          <h2>13. Contact</h2>
           <p>
             Questions about these Terms may be sent to
             <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>.

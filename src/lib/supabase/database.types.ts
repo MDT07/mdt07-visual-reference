@@ -183,6 +183,36 @@ export interface Database {
         Update: never;
         Relationships: [];
       };
+      mdt07_ai_analyses: {
+        Row: {
+          id: string;
+          project_id: string;
+          owner_github_id: string;
+          analysis_kind: "catalog_direction";
+          prompt_version: string;
+          model: string;
+          input_fingerprint: string;
+          input_summary: Json;
+          result: Json;
+          usage: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          owner_github_id: string;
+          analysis_kind?: "catalog_direction";
+          prompt_version: string;
+          model: string;
+          input_fingerprint: string;
+          input_summary?: Json;
+          result: Json;
+          usage?: Json;
+          created_at?: string;
+        };
+        Update: never;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {

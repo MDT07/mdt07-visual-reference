@@ -43,6 +43,8 @@ website; connected functionality belongs only on the private Studio deployment.
 - Supabase-backed projects and collections with notes, tags, favorites, workflow status,
   local filtering, and original Pinterest source links
 - Owner-only JSON catalog export, deletion controls, and security-state maintenance
+- Optional owner-confirmed AI analysis of app-owned briefs, descriptions, notes, tags,
+  favorites, and workflow state; no Pinterest content or external tools are included
 - Distributed rate limiting and owner audit events in Supabase
 - Fail-closed deployment modes, mutation origin checks, security headers, and CI
 - No public registration and no shared Pinterest account access
@@ -72,6 +74,7 @@ website; connected functionality belongs only on the private Studio deployment.
 | `/api/pinterest/*` | 404 | Authenticated Pinterest OAuth/API |
 | `/api/projects`, `/api/collections`, `/api/references` | 404 | Owner-only catalog API |
 | `/api/export`, `/api/audit`, `/api/admin/*` | 404 | Owner-only data and operations API |
+| `/api/ai/catalog-analysis` | 404 | Owner-only preview and read-only AI reports |
 | `/api/agent/*` | 404 by default | Optional developer-only API |
 
 ## Local development
@@ -116,6 +119,12 @@ PINTEREST_SEARCH_PAGE_SIZE=25
 # Studio-only Supabase storage
 SUPABASE_URL=https://your-project-ref.supabase.co
 SUPABASE_SECRET_KEY=
+
+# Optional Studio-only AI analysis
+AI_CATALOG_ENABLED=false
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-5.4-mini
+AI_CATALOG_MAX_REFERENCES=50
 
 # Optional private developer endpoints
 AGENT_API_ENABLED=false
@@ -169,6 +178,8 @@ configured for npm and GitHub Actions updates.
 ## Current limitations
 
 - AI visual analysis and Pinterest write operations are not implemented or claimed.
+- AI catalog analysis is limited to previewed app-owned text and workflow metadata;
+  image analysis, autonomous tools, and catalog mutations remain disabled.
 - Credential rotation is intentionally deferred during the active integration phase;
   rotate all previously handled credentials before expanding access beyond the owner
   or treating the security milestone as complete.

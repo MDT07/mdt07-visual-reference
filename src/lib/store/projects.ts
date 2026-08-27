@@ -64,7 +64,7 @@ function referenceFromJson(
   return { ...(value as unknown as VisualReference), catalog };
 }
 
-async function audit(
+export async function recordAuditEvent(
   action: string,
   targetType: string,
   targetId: string,
@@ -157,7 +157,7 @@ export async function createProject(name: string, brief: string): Promise<Resear
     .select("id,name,brief,status,created_at,updated_at")
     .single();
   if (error) throw error;
-  await audit("project.created", "project", data.id);
+  await recordAuditEvent("project.created", "project", data.id);
   return {
     id: data.id,
     name: data.name,
@@ -190,7 +190,7 @@ export async function updateProject(
     .maybeSingle();
   if (error) throw error;
   if (!data) return null;
-  await audit("project.updated", "project", id, {
+  await recordAuditEvent("project.updated", "project", id, {
     fields: Object.keys(updates),
   });
   return getProject(id);
@@ -222,7 +222,7 @@ export async function createCollection(
   });
   if (error) throw error;
   await touchProject(projectId, now);
-  await audit("collection.created", "project", projectId, { name: name.trim() });
+  await recordAuditEvent("collection.created", "project", projectId, { name: name.trim() });
   return getProject(projectId);
 }
 
@@ -248,7 +248,7 @@ export async function updateCollection(
   if (error) throw error;
   if (!data) return null;
   await touchProject(projectId, payload.updated_at);
-  await audit("collection.updated", "collection", collectionId, {
+  await recordAuditEvent("collection.updated", "collection", collectionId, {
     projectId,
     fields: Object.keys(updates),
   });
@@ -271,7 +271,7 @@ export async function deleteCollection(
   if (error) throw error;
   if (!data) return null;
   await touchProject(projectId);
-  await audit("collection.deleted", "collection", collectionId, { projectId });
+  await recordAuditEvent("collection.deleted", "collection", collectionId, { projectId });
   return getProject(projectId);
 }
 
@@ -285,7 +285,7 @@ export async function deleteProject(id: string): Promise<boolean> {
     .maybeSingle();
   if (error) throw error;
   if (!data) return false;
-  await audit("project.deleted", "project", id);
+  await recordAuditEvent("project.deleted", "project", id);
   return true;
 }
 
@@ -333,7 +333,7 @@ export async function addReferenceToProject(
   if (referenceError) throw referenceError;
 
   await touchProject(projectId, now);
-  await audit("reference.saved", "reference", reference.sourceId, {
+  await recordAuditEvent("reference.saved", "reference", reference.sourceId, {
     projectId,
     collection: normalizedCollection,
     source: reference.source,
@@ -379,7 +379,7 @@ export async function removeReferenceFromProject(
   if (error) throw error;
 
   await touchProject(projectId);
-  await audit("reference.removed", "reference", sourceId, { projectId });
+  await recordAuditEvent("reference.removed", "reference", sourceId, { projectId });
   return getProject(projectId);
 }
 
@@ -419,7 +419,7 @@ export async function updateReferenceCatalog(
   if (error) throw error;
   if (!data) return null;
   await touchProject(projectId, payload.updated_at);
-  await audit("reference.annotated", "reference", referenceRecordId, {
+  await recordAuditEvent("reference.annotated", "reference", referenceRecordId, {
     projectId,
     collectionId,
     fields: Object.keys(updates),

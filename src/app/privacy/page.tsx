@@ -88,6 +88,17 @@ export default function PrivacyPage() {
             does not copy Pinterest image or video files into its own storage. Unsaved
             search results remain transient and are not added to a project automatically.
           </p>
+          <h3>Optional AI catalog analysis</h3>
+          <p>
+            If the private-studio owner enables AI analysis and explicitly confirms a
+            preview, the Application may send a limited, displayed payload to OpenAI.
+            That payload contains app-owned project fields and owner-authored collection
+            descriptions, notes, tags, favorite state, and workflow status. It excludes
+            Pinterest images and video, Pin titles and descriptions, Pinterest URLs and
+            account identifiers, GitHub profile data, email addresses, OAuth tokens, and
+            application secrets. Merely opening the Studio or preparing a preview does
+            not send catalog data to OpenAI.
+          </p>
           <h3>Technical information</h3>
           <p>
             The hosting provider may process routine request information such as IP
@@ -120,6 +131,7 @@ export default function PrivacyPage() {
             <li>To authenticate and authorize the configured private-studio owner.</li>
             <li>To list available public boards and rank Pins from the board you select for visual research.</li>
             <li>To save and organize owner-selected references into projects and collections.</li>
+            <li>When explicitly requested, to generate a read-only structured research report from the previewed app-owned catalog fields.</li>
             <li>To link users back to original Pinterest sources.</li>
             <li>To enforce short-lived request limits and protect API access from abuse.</li>
             <li>To operate, secure, and diagnose the Application.</li>
@@ -161,6 +173,17 @@ export default function PrivacyPage() {
             Routine hosting security and request logs follow the hosting provider’s
             retention settings.
           </p>
+          <p>
+            AI requests use the OpenAI Responses API with response storage disabled.
+            The Application stores the resulting structured report, model name, token
+            usage, input fingerprint, and aggregate scope counts in Supabase; it does
+            not duplicate the full preview payload in the AI history table. OpenAI
+            states that API data is not used to train its models by default. Depending
+            on the OpenAI API project&apos;s approved data controls, customer content may
+            still be retained in abuse-monitoring logs for up to 30 days. The owner
+            should not enter sensitive personal information into project briefs, notes,
+            tags, or collection descriptions intended for AI analysis.
+          </p>
         </section>
 
         <section>
@@ -199,7 +222,9 @@ export default function PrivacyPage() {
             Application. Pinterest processes information under its own terms and privacy
             policy. Supabase provides the private database used for encrypted OAuth
             sessions, saved project metadata, rate-limit counters, and security audit
-            events. The production website is currently hosted on Vercel, whose systems
+            events. If owner-controlled AI analysis is enabled, OpenAI processes only
+            the exact app-owned payload displayed and confirmed in the Studio to
+            generate a structured read-only report. The production website is currently hosted on Vercel, whose systems
             may process technical request data needed to deliver the service. If you
             contact the project by email, your email provider and the recipient’s email
             provider will process that message under their own policies.

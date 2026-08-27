@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import CatalogAnalysisPanel from "@/components/ai/CatalogAnalysisPanel";
 import type { VisualReference } from "@/lib/pinterest/types";
 import type { SearchPipelineResult } from "@/lib/search/types";
 import type {
@@ -818,6 +819,7 @@ export default function ReferencesSearchShell({
           onRemove={(reference) => void removeReference(reference)}
         />
       </section>
+      <CatalogAnalysisPanel project={selectedProject} />
     </div>
   );
 }

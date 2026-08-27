@@ -24,6 +24,9 @@
 | OAuth login CSRF or callback replay | Random state, HTTP-only state cookie, owner session, short expiry |
 | CSRF on disconnect/refresh | Owner session, SameSite cookie, mandatory matching Origin |
 | Token exposure | Server-only modules, encrypted Supabase vault, opaque HTTP-only cookie, redacted errors/logs |
+| Catalog text leaks through AI | Exact preview, fingerprint confirmation, app-owned field allowlist, no Pinterest fields, server-only API key, `store=false` |
+| Prompt injection in owner notes | Notes treated as untrusted data, fixed developer instructions, structured output, no model tools |
+| AI performs an external action | No tools, no Pinterest write scopes, output saved only as a separate read-only report |
 | Preview deployment leaks production secret | Separate Vercel projects and environment targeting |
 | Cross-instance abuse | Atomic distributed rate limiter in Supabase |
 | Unauthorized role escalation | Immutable GitHub ID allowlist; no role mutation endpoint |
