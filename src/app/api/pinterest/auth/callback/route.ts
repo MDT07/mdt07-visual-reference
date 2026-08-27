@@ -47,7 +47,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const response = NextResponse.redirect(redirectUrl.toString());
     response.headers.set("Cache-Control", "no-store, max-age=0");
     response.headers.set("Pragma", "no-cache");
-    setPinterestSession(response, session);
+    await setPinterestSession(response, session, request);
     response.cookies.delete(oauthStateCookieName);
     return response;
   } catch (err) {

@@ -21,6 +21,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   redirectUrl.searchParams.set("oauth", "disconnected");
   const response = NextResponse.redirect(redirectUrl, 303);
   response.headers.set("Cache-Control", "no-store, max-age=0");
-  clearPinterestSession(response);
+  await clearPinterestSession(response, request);
   return response;
 }

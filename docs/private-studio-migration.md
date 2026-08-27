@@ -30,6 +30,9 @@ private preview passed all checks. The split deployment cutover is now complete.
   boards, and a live uncached 15-Pin search after the final redeploy.
 - Kept the old public Pinterest callback registered temporarily for rollback and
   observation; the public application no longer serves the callback route.
+- Added Supabase-backed owner projects, encrypted server-side Pinterest sessions,
+  distributed rate limits, and audit events without changing existing Pinterest,
+  GitHub, or Auth.js credentials.
 
 ## Preparation
 
@@ -40,6 +43,8 @@ private preview passed all checks. The split deployment cutover is now complete.
    `https://mdt07-reference-studio.vercel.app/api/auth/callback/github`.
 5. Set `OWNER_GITHUB_ID=172265857` and private Auth.js variables.
 6. Do not expose Pinterest secrets to public or preview environments.
+7. Configure `SUPABASE_URL` and a dedicated `SUPABASE_SECRET_KEY` only on the
+   private Studio project.
 
 ## Pinterest cutover
 

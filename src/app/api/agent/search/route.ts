@@ -12,7 +12,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const authError = await requireAgentApiAuth(request);
   if (authError) return authError;
 
-  const session = getPinterestSessionFromRequest(request);
+  const session = await getPinterestSessionFromRequest(request);
   if (!session) {
     return NextResponse.json(
       { error: "Pinterest is not connected for this session." },
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const rateLimit = checkRateLimit(request, "agent-search", 20, 60_000);
+  const rateLimit = await checkRateLimit(request, "agent-search", 20, 60_000);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Rate limit reached. Try again shortly." },

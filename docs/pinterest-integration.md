@@ -18,7 +18,8 @@ does not claim global Pinterest search or write access.
 Owner -> GitHub OAuth -> Auth.js owner session
 Owner -> /api/pinterest/auth -> Pinterest consent
 Pinterest -> /api/pinterest/auth/callback -> state validation + token exchange
-Server -> encrypted, Secure, HTTP-only Pinterest session cookie
+Server -> encrypted Pinterest token record in Supabase
+Browser <- opaque, Secure, HTTP-only session identifier
 Studio -> owner-protected API route -> Pinterest API v5
 ```
 
@@ -40,9 +41,11 @@ the request `Origin`.
 | `PINTEREST_APP_ID` | Pinterest App ID |
 | `PINTEREST_APP_SECRET` | Pinterest App Secret |
 | `PINTEREST_REDIRECT_URI` | Exact Pinterest callback registered for this host |
-| `PINTEREST_SESSION_SECRET` | At least 32 random characters; encrypts the token cookie |
+| `PINTEREST_SESSION_SECRET` | At least 32 random characters; encrypts the server-side token payload |
 | `PINTEREST_API_BASE` | Production or supported Sandbox API base |
 | `PINTEREST_SEARCH_PAGE_SIZE` | Pin page size |
+| `SUPABASE_URL` | Private Supabase project API URL |
+| `SUPABASE_SECRET_KEY` | Dedicated server-only secret key; never sent to the browser |
 
 No credential or access token belongs in a `NEXT_PUBLIC_*` variable, Git history,
 logs, screenshots, or demo fixtures.
@@ -54,12 +57,13 @@ Project brief -> structured design intent -> query strategy
               -> list connected account public boards
               -> select board -> list its Pins
               -> normalize -> deduplicate -> score -> rank
-              -> source-linked temporary references
+              -> owner-selected, source-linked project references
 ```
 
-Pinterest responses use `Cache-Control: no-store`. The web UI retains results and
-moodboard selections only in open-page React state. The current application does not
-persist Pinterest content in a database.
+Pinterest responses use `Cache-Control: no-store`. Unsaved results remain in open-page
+React state. When the owner explicitly saves a reference, the application persists
+selected Pin metadata and the original source URL in Supabase; Pinterest media files
+remain at their original source and are not copied into application storage.
 
 ## Production redirect values
 
@@ -74,10 +78,6 @@ owner authentication works on that host.
 
 ## Known hardening work
 
-- Replace in-memory rate limiting with a shared server-side store.
-- Replace cookie-contained Pinterest credentials with revocable server-side token
-  records before expanding access beyond the owner.
-- Replace local JSON project storage before enabling Agent API in production.
 - Rotate all credentials previously handled during development before final cutover.
 - Add audited write actions only if a later product need justifies additional scopes.
 

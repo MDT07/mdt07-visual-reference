@@ -8,6 +8,7 @@ import { isPinterestConfigured } from "@/lib/config";
 import { deploymentConfig } from "@/lib/deployment";
 import { getPinterestSessionFromCookies } from "@/lib/pinterest/session";
 import { REFERENCE_PRESETS } from "@/lib/reference-presets";
+import { listProjects } from "@/lib/store/projects";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,7 @@ export default async function StudioPage() {
 
   const configured = isPinterestConfigured();
   const connected = configured && Boolean(await getPinterestSessionFromCookies());
+  const projects = configured ? await listProjects() : [];
 
   return (
     <main>
@@ -88,6 +90,7 @@ export default async function StudioPage() {
           <ReferencesSearchShell
             presets={[...REFERENCE_PRESETS]}
             isAvailable={connected}
+            initialProjects={projects}
             labels={{
               placeholder: "Describe the visual direction...",
               button: "Search",

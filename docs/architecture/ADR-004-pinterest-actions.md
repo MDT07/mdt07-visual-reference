@@ -6,7 +6,8 @@ Status: Accepted
 
 - Request only `boards:read` and `pins:read`.
 - Fetch boards and Pins live for the authenticated owner.
-- Keep the moodboard in the open page only.
+- Persist only references the owner explicitly saves, with their original Pin links.
+- Do not copy Pinterest media binaries into application storage.
 - Preserve Pinterest attribution and original Pin links.
 - Do not scrape, train models on Pinterest material, or send API content to an
   external AI provider.

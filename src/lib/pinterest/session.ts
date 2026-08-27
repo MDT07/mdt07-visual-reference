@@ -8,7 +8,10 @@ import {
 } from "node:crypto";
 import { cookies } from "next/headers";
 import type { NextRequest, NextResponse } from "next/server";
+
 import { pinterestConfig } from "@/lib/config";
+import { deploymentConfig } from "@/lib/deployment";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { PinterestTokenResponse } from "./types";
 
 export interface PinterestSession {
@@ -35,13 +38,20 @@ export const pinterestSessionCookieName =
 
 function encryptionKey(): Buffer {
   if (pinterestConfig.sessionSecret.length < 32) {
-    throw new Error(
-      "PINTEREST_SESSION_SECRET must contain at least 32 characters."
-    );
+    throw new Error("PINTEREST_SESSION_SECRET must contain at least 32 characters.");
   }
-  return createHash("sha256")
-    .update(pinterestConfig.sessionSecret, "utf8")
-    .digest();
+  return createHash("sha256").update(pinterestConfig.sessionSecret, "utf8").digest();
+}
+
+function ownerGithubId(): string {
+  if (!deploymentConfig.ownerGithubId) {
+    throw new Error("OWNER_GITHUB_ID is required for Pinterest sessions.");
+  }
+  return deploymentConfig.ownerGithubId;
+}
+
+function sessionIdHash(sessionId: string): string {
+  return createHash("sha256").update(sessionId, "utf8").digest("hex");
 }
 
 function isPinterestSession(value: unknown): value is PinterestSession {
@@ -52,11 +62,9 @@ function isPinterestSession(value: unknown): value is PinterestSession {
     candidate.accessToken.length > 0 &&
     typeof candidate.expiresAt === "number" &&
     Number.isFinite(candidate.expiresAt) &&
-    (candidate.refreshToken === undefined ||
-      typeof candidate.refreshToken === "string") &&
+    (candidate.refreshToken === undefined || typeof candidate.refreshToken === "string") &&
     (candidate.refreshExpiresAt === undefined ||
-      (typeof candidate.refreshExpiresAt === "number" &&
-        Number.isFinite(candidate.refreshExpiresAt))) &&
+      (typeof candidate.refreshExpiresAt === "number" && Number.isFinite(candidate.refreshExpiresAt))) &&
     (candidate.scope === undefined || typeof candidate.scope === "string")
   );
 }
@@ -88,24 +96,18 @@ export function encryptPinterestSession(session: PinterestSession): string {
     cipher.update(JSON.stringify(session), "utf8"),
     cipher.final(),
   ]);
-  const authTag = cipher.getAuthTag();
-  return Buffer.concat([iv, authTag, encrypted]).toString("base64url");
+  return Buffer.concat([iv, cipher.getAuthTag(), encrypted]).toString("base64url");
 }
 
-export function decryptPinterestSession(
-  encoded: string | undefined
-): PinterestSession | null {
+export function decryptPinterestSession(encoded: string | undefined): PinterestSession | null {
   if (!encoded) return null;
   try {
     const payload = Buffer.from(encoded, "base64url");
     if (payload.length <= 28) return null;
-    const iv = payload.subarray(0, 12);
-    const authTag = payload.subarray(12, 28);
-    const encrypted = payload.subarray(28);
-    const decipher = createDecipheriv("aes-256-gcm", encryptionKey(), iv);
-    decipher.setAuthTag(authTag);
+    const decipher = createDecipheriv("aes-256-gcm", encryptionKey(), payload.subarray(0, 12));
+    decipher.setAuthTag(payload.subarray(12, 28));
     const decrypted = Buffer.concat([
-      decipher.update(encrypted),
+      decipher.update(payload.subarray(28)),
       decipher.final(),
     ]).toString("utf8");
     const session: unknown = JSON.parse(decrypted);
@@ -115,47 +117,95 @@ export function decryptPinterestSession(
   }
 }
 
-export function getPinterestSessionFromRequest(
+async function loadPinterestSession(sessionId: string | undefined): Promise<PinterestSession | null> {
+  if (!sessionId) return null;
+  const supabase = getSupabaseAdmin();
+  const hash = sessionIdHash(sessionId);
+  const { data, error } = await supabase
+    .from("mdt07_pinterest_connections")
+    .select("encrypted_payload,refresh_expires_at")
+    .eq("session_id_hash", hash)
+    .eq("owner_github_id", ownerGithubId())
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+
+  if (data.refresh_expires_at && new Date(data.refresh_expires_at).getTime() <= Date.now()) {
+    await supabase.from("mdt07_pinterest_connections").delete().eq("session_id_hash", hash);
+    return null;
+  }
+
+  const session = decryptPinterestSession(data.encrypted_payload);
+  if (!session) {
+    await supabase.from("mdt07_pinterest_connections").delete().eq("session_id_hash", hash);
+    return null;
+  }
+
+  void supabase
+    .from("mdt07_pinterest_connections")
+    .update({ last_used_at: new Date().toISOString() })
+    .eq("session_id_hash", hash);
+  return session;
+}
+
+export async function getPinterestSessionFromRequest(
   request: NextRequest
-): PinterestSession | null {
-  return decryptPinterestSession(
-    request.cookies.get(pinterestSessionCookieName)?.value
-  );
+): Promise<PinterestSession | null> {
+  return loadPinterestSession(request.cookies.get(pinterestSessionCookieName)?.value);
 }
 
 export async function getPinterestSessionFromCookies(): Promise<PinterestSession | null> {
   const cookieStore = await cookies();
-  return decryptPinterestSession(
-    cookieStore.get(pinterestSessionCookieName)?.value
-  );
+  return loadPinterestSession(cookieStore.get(pinterestSessionCookieName)?.value);
 }
 
-export function setPinterestSession(
+export async function setPinterestSession(
   response: NextResponse,
-  session: PinterestSession
-): void {
+  session: PinterestSession,
+  request?: NextRequest
+): Promise<void> {
+  const existingSessionId = request?.cookies.get(pinterestSessionCookieName)?.value;
+  const sessionId = existingSessionId ?? randomBytes(32).toString("base64url");
+  const now = new Date().toISOString();
+  const { error } = await getSupabaseAdmin().from("mdt07_pinterest_connections").upsert({
+    session_id_hash: sessionIdHash(sessionId),
+    owner_github_id: ownerGithubId(),
+    encrypted_payload: encryptPinterestSession(session),
+    access_expires_at: new Date(session.expiresAt).toISOString(),
+    refresh_expires_at: session.refreshExpiresAt
+      ? new Date(session.refreshExpiresAt).toISOString()
+      : null,
+    updated_at: now,
+    last_used_at: now,
+  });
+  if (error) throw error;
+
   const remainingRefreshLifetime = session.refreshExpiresAt
     ? Math.floor((session.refreshExpiresAt - Date.now()) / 1000)
     : SESSION_MAX_AGE_SECONDS;
-  const maxAge = Math.max(
-    60,
-    Math.min(SESSION_MAX_AGE_SECONDS, remainingRefreshLifetime)
-  );
-
-  response.cookies.set(
-    pinterestSessionCookieName,
-    encryptPinterestSession(session),
-    {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge,
-      path: "/",
-    }
-  );
+  const maxAge = Math.max(60, Math.min(SESSION_MAX_AGE_SECONDS, remainingRefreshLifetime));
+  response.cookies.set(pinterestSessionCookieName, sessionId, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge,
+    path: "/",
+  });
 }
 
-export function clearPinterestSession(response: NextResponse): void {
+export async function clearPinterestSession(
+  response: NextResponse,
+  request?: NextRequest
+): Promise<void> {
+  const sessionId = request?.cookies.get(pinterestSessionCookieName)?.value;
+  if (sessionId) {
+    const { error } = await getSupabaseAdmin()
+      .from("mdt07_pinterest_connections")
+      .delete()
+      .eq("session_id_hash", sessionIdHash(sessionId))
+      .eq("owner_github_id", ownerGithubId());
+    if (error) throw error;
+  }
   response.cookies.set(pinterestSessionCookieName, "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

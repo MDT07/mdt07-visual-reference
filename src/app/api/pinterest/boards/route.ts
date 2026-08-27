@@ -18,7 +18,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const accessError = await requireOwnerApi();
   if (accessError) return accessError;
 
-  const session = getPinterestSessionFromRequest(request);
+  const session = await getPinterestSessionFromRequest(request);
   if (!session) {
     return NextResponse.json(
       { error: "Connect Pinterest for this browser session first." },
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const rateLimit = checkRateLimit(request, "pinterest-boards", 20, 60_000);
+  const rateLimit = await checkRateLimit(request, "pinterest-boards", 20, 60_000);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Board refresh limit reached. Try again shortly." },
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         },
       }
     );
-    if (result.refreshed) setPinterestSession(response, result.session);
+    if (result.refreshed) await setPinterestSession(response, result.session, request);
     return response;
   } catch (error) {
     const status = error instanceof PinterestError ? error.status : 500;
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
       { status, headers: { "Cache-Control": "no-store" } }
     );
-    if (status === 401) clearPinterestSession(response);
+    if (status === 401) await clearPinterestSession(response, request);
     return response;
   }
 }

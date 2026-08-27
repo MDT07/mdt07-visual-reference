@@ -39,6 +39,8 @@ export const agentApiConfig = {
 export const isPinterestConfigured = (): boolean =>
   Boolean(
       deploymentConfig.isStudio &&
+      process.env.SUPABASE_URL?.trim() &&
+      process.env.SUPABASE_SECRET_KEY?.trim().startsWith("sb_secret_") &&
       pinterestConfig.appId &&
       pinterestConfig.appSecret &&
       pinterestConfig.redirectUri &&
@@ -52,7 +54,7 @@ export const isPinterestConfigured = (): boolean =>
 export function assertPinterestConfigured(): void {
   if (!isPinterestConfigured()) {
     throw new Error(
-      "Pinterest OAuth is not configured for studio mode. Set APP_MODE=studio, PINTEREST_APP_ID, PINTEREST_APP_SECRET, PINTEREST_SESSION_SECRET, and an exact PINTEREST_REDIRECT_URI on APP_URL at /api/pinterest/auth/callback."
+      "Pinterest OAuth is not configured for studio mode. Set APP_MODE=studio, server-only Supabase credentials, Pinterest credentials, PINTEREST_SESSION_SECRET, and an exact PINTEREST_REDIRECT_URI on APP_URL at /api/pinterest/auth/callback."
     );
   }
 }

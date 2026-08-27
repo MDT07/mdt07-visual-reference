@@ -22,7 +22,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const session = getPinterestSessionFromRequest(request);
+  const session = await getPinterestSessionFromRequest(request);
   if (!session) {
     return NextResponse.json(
       { error: "Pinterest is not connected for this session." },
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const rateLimit = checkRateLimit(request, "pinterest-refresh", 10, 60_000);
+  const rateLimit = await checkRateLimit(request, "pinterest-refresh", 10, 60_000);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Too many refresh requests. Try again shortly." },
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       { success: true },
       { headers: { ...rateLimitHeaders(rateLimit), "Cache-Control": "no-store" } }
     );
-    setPinterestSession(response, active.session);
+    await setPinterestSession(response, active.session, request);
     return response;
   } catch (err) {
     console.error(
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       { error: "Pinterest authorization has expired. Connect again." },
       { status: 401, headers: { "Cache-Control": "no-store" } }
     );
-    clearPinterestSession(response);
+    await clearPinterestSession(response, request);
     return response;
   }
 }

@@ -14,7 +14,7 @@
 2. Owner browser to private Vercel project
 3. Private server to GitHub OAuth
 4. Private server to Pinterest OAuth/API
-5. Private server to future database/rate-limit storage
+5. Private server to Supabase database, token vault, and rate-limit storage
 
 ## Primary threats and controls
 
@@ -23,19 +23,16 @@
 | Public user starts Pinterest OAuth | Public mode returns 404; studio requires owner app-session |
 | OAuth login CSRF or callback replay | Random state, HTTP-only state cookie, owner session, short expiry |
 | CSRF on disconnect/refresh | Owner session, SameSite cookie, mandatory matching Origin |
-| Token exposure | Server-only modules, encryption, HTTP-only cookie, redacted errors/logs |
+| Token exposure | Server-only modules, encrypted Supabase vault, opaque HTTP-only cookie, redacted errors/logs |
 | Preview deployment leaks production secret | Separate Vercel projects and environment targeting |
-| Cross-instance abuse | Distributed rate limiter before private production cutover |
+| Cross-instance abuse | Atomic distributed rate limiter in Supabase |
 | Unauthorized role escalation | Immutable GitHub ID allowlist; no role mutation endpoint |
 | Agent key abuse | Production-disabled; local opt-in additionally requires owner session and bearer key |
 | Pinterest policy violation | Live no-store responses, attribution, no external AI processing or hidden writes |
 
 ## Residual risks before private production
 
-- The current limiter remains instance-local.
-- Pinterest tokens remain in an encrypted browser cookie until the database token
-  vault milestone.
 - Credentials have not yet been rotated at the owner's instruction.
 
 The owner has accepted these risks temporarily for the working private Studio. They
-block expansion beyond the single-owner model and completion of the security milestone.
+block expansion beyond the single-owner model.

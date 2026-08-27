@@ -24,7 +24,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     | "premium"
     | "experimental"
     | null;
-  const session = getPinterestSessionFromRequest(request);
+  const session = await getPinterestSessionFromRequest(request);
 
   if (!session) {
     return NextResponse.json(
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const rateLimit = checkRateLimit(request, "pinterest-search", 30, 60_000);
+  const rateLimit = await checkRateLimit(request, "pinterest-search", 30, 60_000);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Search limit reached. Try again shortly." },
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
       { status, headers: { "Cache-Control": "no-store" } }
     );
-    if (status === 401) clearPinterestSession(response);
+    if (status === 401) await clearPinterestSession(response, request);
     return response;
   }
 }

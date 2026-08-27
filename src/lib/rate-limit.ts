@@ -2,86 +2,60 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 import type { NextRequest } from "next/server";
+
 import { pinterestConfig } from "@/lib/config";
 import { pinterestSessionCookieName } from "@/lib/pinterest/session";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
-interface RateLimitBucket {
-  count: number;
-  resetAt: number;
-}
-
-interface RateLimitResult {
+export interface RateLimitResult {
   allowed: boolean;
   limit: number;
   remaining: number;
   retryAfter: number;
 }
 
-const buckets = new Map<string, RateLimitBucket>();
-let lastCleanup = 0;
-
-function cleanupExpiredBuckets(now: number): void {
-  if (now - lastCleanup < 60_000) return;
-  lastCleanup = now;
-  for (const [key, bucket] of buckets) {
-    if (bucket.resetAt <= now) buckets.delete(key);
-  }
-}
-
 function requestKey(request: NextRequest, namespace: string): string {
   const forwardedFor = request.headers.get("x-forwarded-for") ?? "unknown";
   const ip = forwardedFor.split(",")[0]?.trim() ?? "unknown";
-  const session =
-    request.cookies.get(pinterestSessionCookieName)?.value ?? "anonymous";
-  const secret = pinterestConfig.sessionSecret || "local-rate-limit";
-
+  const session = request.cookies.get(pinterestSessionCookieName)?.value ?? "anonymous";
+  const secret = pinterestConfig.sessionSecret || "unconfigured";
   return createHash("sha256")
     .update(`${secret}:${namespace}:${ip}:${session}`)
     .digest("hex");
 }
 
-export function checkRateLimit(
+export async function checkRateLimit(
   request: NextRequest,
   namespace: string,
   limit: number,
   windowMs: number
-): RateLimitResult {
-  const now = Date.now();
-  cleanupExpiredBuckets(now);
-  const key = requestKey(request, namespace);
-  const current = buckets.get(key);
-
-  if (!current || current.resetAt <= now) {
-    buckets.set(key, { count: 1, resetAt: now + windowMs });
-    return {
-      allowed: true,
-      limit,
-      remaining: limit - 1,
-      retryAfter: Math.ceil(windowMs / 1000),
-    };
+): Promise<RateLimitResult> {
+  const fallback = { allowed: false, limit, remaining: 0, retryAfter: 60 };
+  try {
+    const { data, error } = await getSupabaseAdmin().rpc("mdt07_consume_rate_limit", {
+      p_namespace: namespace,
+      p_subject_hash: requestKey(request, namespace),
+      p_limit: limit,
+      p_window_seconds: Math.max(1, Math.ceil(windowMs / 1000)),
+    });
+    if (error) {
+      console.error("Distributed rate limit failed", { namespace, code: error.code });
+      return fallback;
+    }
+    const result = data?.[0];
+    return result
+      ? { allowed: result.allowed, limit, remaining: result.remaining, retryAfter: result.retry_after }
+      : fallback;
+  } catch (error) {
+    console.error("Distributed rate limit unavailable", {
+      namespace,
+      message: error instanceof Error ? error.message : "Unknown error",
+    });
+    return fallback;
   }
-
-  if (current.count >= limit) {
-    return {
-      allowed: false,
-      limit,
-      remaining: 0,
-      retryAfter: Math.max(1, Math.ceil((current.resetAt - now) / 1000)),
-    };
-  }
-
-  current.count += 1;
-  return {
-    allowed: true,
-    limit,
-    remaining: limit - current.count,
-    retryAfter: Math.max(1, Math.ceil((current.resetAt - now) / 1000)),
-  };
 }
 
-export function rateLimitHeaders(
-  result: RateLimitResult
-): Record<string, string> {
+export function rateLimitHeaders(result: RateLimitResult): Record<string, string> {
   return {
     "X-RateLimit-Limit": String(result.limit),
     "X-RateLimit-Remaining": String(result.remaining),

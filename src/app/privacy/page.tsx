@@ -3,7 +3,7 @@ import PageIntro from "@/components/site/PageIntro";
 import { getPublicUrl, siteConfig } from "@/lib/config";
 
 const description =
-  "Privacy Policy for MDT07 Visual Reference, including Pinterest OAuth, encrypted sessions, transient API data, and deletion choices.";
+  "Privacy Policy for MDT07 Visual Reference, including Pinterest OAuth, encrypted server-side sessions, saved references, and deletion choices.";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -26,7 +26,7 @@ export default function PrivacyPage() {
       />
 
       <div className="legal-content py-12">
-        <p><strong>Last updated:</strong> August 25, 2026</p>
+        <p><strong>Last updated:</strong> August 27, 2026</p>
 
         <section>
           <h2>1. Scope of this policy</h2>
@@ -78,12 +78,13 @@ export default function PrivacyPage() {
             request profile, secret-content, or write scopes and does not retrieve secret
             boards or secret Pins.
           </p>
-          <h3>Session moodboard</h3>
+          <h3>Projects and saved references</h3>
           <p>
-            When you select a reference for the moodboard, the Application keeps the
-            relevant Pin data only in the memory of the open browser page. The current
-            moodboard is cleared when the page is refreshed or closed. It is not written
-            to the server, local storage, session storage, or the source repository.
+            When the private-studio owner explicitly saves a reference, the Application
+            stores the project name, project brief, collection name, relevant Pin
+            metadata, and original Pinterest source URL in its Supabase database. It
+            does not copy Pinterest image or video files into its own storage. Unsaved
+            search results remain transient and are not added to a project automatically.
           </p>
           <h3>Technical information</h3>
           <p>
@@ -116,7 +117,7 @@ export default function PrivacyPage() {
             <li>To authenticate authorized requests to the Pinterest API.</li>
             <li>To authenticate and authorize the configured private-studio owner.</li>
             <li>To list available public boards and rank Pins from the board you select for visual research.</li>
-            <li>To curate selected references into the Application’s moodboard.</li>
+            <li>To save and organize owner-selected references into projects and collections.</li>
             <li>To link users back to original Pinterest sources.</li>
             <li>To enforce short-lived request limits and protect API access from abuse.</li>
             <li>To operate, secure, and diagnose the Application.</li>
@@ -133,27 +134,28 @@ export default function PrivacyPage() {
           <p>
             The Pinterest App Secret is held only in protected server environment
             configuration. After OAuth, the access token and any refresh token are
-            encrypted into an HTTP-only, Secure production session cookie that browser
-            JavaScript cannot read. The Application does not keep one shared user token,
-            write user tokens to its source repository, or persist them in an application
-            database. The session cookie expires no later than the configured refresh
-            lifetime and is replaced when Pinterest refreshes authorization.
+            encrypted before being stored in a private Supabase record. The browser
+            receives only a random, opaque identifier in an HTTP-only, Secure production
+            cookie; browser JavaScript cannot read the cookie or Pinterest tokens. The
+            record is scoped to the configured owner and expires no later than the
+            available refresh lifetime. Tokens are never written to the source repository.
           </p>
           <p>
             Private-studio authentication currently uses an encrypted application
             session cookie. The Application does not currently maintain a public user
-            directory or accept self-service registrations. Its developer-only local
-            project store remains disabled on the public production website.
+            directory or accept self-service registrations. Saved projects and
+            references are available only through owner-authorized server routes on the
+            private studio; the public production website has no database access key.
           </p>
           <p>
             Pinterest API responses are returned with instructions not to cache and
-            are kept only in the memory of the open page. Pinterest images are loaded
-            from their original remote source without the Application’s image optimization
-            cache. The developer-only Agent API and its local project store are disabled
-            on the public production website. OAuth state cookies expire after approximately ten minutes. A one-way
-            identifier derived from request and session information may remain briefly
-            in an individual server instance to enforce one-minute request windows,
-            until routine cleanup or instance recycling.
+            are kept only in the memory of the open page unless the owner explicitly
+            saves a reference. Pinterest images are loaded from their original remote
+            source without the Application’s image optimization cache. The
+            developer-only Agent API remains disabled on the public production website.
+            OAuth state cookies expire after approximately ten minutes. One-way request
+            identifiers and short-lived counters are stored in Supabase to enforce
+            request limits across server instances.
             Routine hosting security and request logs follow the hosting provider’s
             retention settings.
           </p>
@@ -166,8 +168,8 @@ export default function PrivacyPage() {
             after GitHub authentication. The Application also uses a short-lived,
             HTTP-only cookie during
             Pinterest OAuth to verify the state parameter. If authorization succeeds, it
-            uses a separate encrypted HTTP-only cookie to isolate that browser’s Pinterest
-            tokens and connection state. It does not currently use local storage,
+            uses a separate HTTP-only cookie containing only an opaque random identifier
+            for the encrypted server-side Pinterest connection. It does not currently use local storage,
             session storage, advertising cookies, or analytics cookies. If those
             practices change, this policy will be updated.
           </p>
@@ -177,9 +179,11 @@ export default function PrivacyPage() {
           <h2>7. Security</h2>
           <p>
             Reasonable technical measures are used to protect data, including keeping
-            the Pinterest App Secret in server-side configuration, encrypting tokens in
-            an HTTP-only session cookie, checking OAuth state, limiting connected API
-            requests, and serving production traffic over HTTPS.
+            the Pinterest App Secret and Supabase secret key in server-side configuration,
+            encrypting OAuth tokens before database storage, keeping only an opaque
+            identifier in the browser, checking OAuth state, enforcing distributed
+            request limits, applying database row-level security, and serving production
+            traffic over HTTPS.
             No internet service or storage method can be guaranteed to be completely
             secure.
           </p>
@@ -191,7 +195,9 @@ export default function PrivacyPage() {
             GitHub supplies the owner authentication service used by the private
             studio. Pinterest supplies the content and OAuth/API services used by the
             Application. Pinterest processes information under its own terms and privacy
-            policy. The production website is currently hosted on Vercel, whose systems
+            policy. Supabase provides the private database used for encrypted OAuth
+            sessions, saved project metadata, rate-limit counters, and security audit
+            events. The production website is currently hosted on Vercel, whose systems
             may process technical request data needed to deliver the service. If you
             contact the project by email, your email provider and the recipient’s email
             provider will process that message under their own policies.
@@ -211,11 +217,11 @@ export default function PrivacyPage() {
             authorization through Pinterest.
           </p>
           <p>
-            Use the Disconnect control or sign out of the private studio to delete the
-            encrypted token cookie from this browser. You can also revoke the Application in Pinterest
-            account settings. Because the Application does not maintain a user-token
-            database, it generally has no separate token record to locate after the
-            cookie is removed. For questions or a request concerning other information,
+            Use the Disconnect control to delete both the opaque browser cookie and its
+            encrypted Pinterest connection record. You can also revoke the Application in Pinterest
+            account settings. Saved projects or references can be deleted through the
+            private studio as those controls become available, or by contacting the
+            project. For questions or a request concerning other information,
             email <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>.
             Routine security logs may remain until the hosting provider’s normal
             retention cycle completes.

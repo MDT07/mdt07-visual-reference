@@ -26,14 +26,14 @@ export default function TermsPage() {
       />
 
       <div className="legal-content py-12">
-        <p><strong>Last updated:</strong> August 25, 2026</p>
+        <p><strong>Last updated:</strong> August 27, 2026</p>
 
         <section>
           <h2>1. Purpose of the Application</h2>
           <p>
             MDT07 Visual Reference (the “Application”) is an independent,
             project-scoped visual research workspace for web design and development.
-            It may use transient, source-linked Pinterest references to support research
+            It may use owner-selected, source-linked Pinterest references to support research
             and the creation of original work. It is not a replacement Pinterest client,
             an official Pinterest product, or endorsed by or affiliated with Pinterest.
           </p>
@@ -120,7 +120,7 @@ export default function TermsPage() {
             The Application is provided on an “as available” basis. Features may be
             corrected, limited, suspended, or changed, including to comply with
             Pinterest requirements, protect security, or account for API changes. There
-            is no promise that every Pin, board, search result, or session reference will
+            is no promise that every Pin, board, search result, or saved reference will
             remain available.
           </p>
         </section>

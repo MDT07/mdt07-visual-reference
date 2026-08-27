@@ -4,6 +4,7 @@ import type { VisualReference } from "@/lib/pinterest/types";
 
 interface MoodboardGridProps {
   pins: VisualReference[];
+  onRemove?: (pin: VisualReference) => void;
   labels: {
     attribution: string;
     originalPin: string;
@@ -11,7 +12,7 @@ interface MoodboardGridProps {
   };
 }
 
-export default function MoodboardGrid({ pins, labels }: MoodboardGridProps) {
+export default function MoodboardGrid({ pins, labels, onRemove }: MoodboardGridProps) {
   if (pins.length === 0) {
     return <p className="text-sm text-text-tertiary">{labels.empty}</p>;
   }
@@ -60,6 +61,15 @@ export default function MoodboardGrid({ pins, labels }: MoodboardGridProps) {
                 {labels.originalPin}
               </a>
             </div>
+            {onRemove && (
+              <button
+                type="button"
+                onClick={() => onRemove(pin)}
+                className="mt-3 text-xs text-red-600 underline-offset-4 hover:underline"
+              >
+                Remove from collection
+              </button>
+            )}
           </div>
         </article>
       ))}

@@ -3,7 +3,7 @@
 A private, project-scoped visual research studio with a public product and legal
 website. The studio lets its owner connect Pinterest with read-only access, select a
 public board, rank Pins against a web-project brief, and compare source-linked
-references in a temporary moodboard.
+references in persistent, owner-scoped project collections.
 
 MDT07 Visual Reference is an independent project. It is not endorsed by, affiliated
 with, or an official product of Pinterest.
@@ -38,9 +38,10 @@ website; connected functionality belongs only on the private Studio deployment.
 - Private GitHub owner authentication through Auth.js
 - Pinterest OAuth 2.0 protected by both owner auth and a short-lived state cookie
 - Read-only `boards:read` and `pins:read` access
-- Per-browser encrypted HTTP-only Pinterest token session
+- Revocable server-side Pinterest token vault with an opaque HTTP-only session cookie
 - Board Pin retrieval and local relevance ranking against a project brief
-- Session-only reference moodboard with original Pinterest source links
+- Supabase-backed projects and reference collections with original Pinterest source links
+- Distributed rate limiting and owner audit events in Supabase
 - Fail-closed deployment modes, mutation origin checks, security headers, and CI
 - No public registration and no shared Pinterest account access
 
@@ -108,6 +109,10 @@ PINTEREST_SESSION_SECRET=
 PINTEREST_API_BASE=https://api.pinterest.com/v5
 PINTEREST_SEARCH_PAGE_SIZE=25
 
+# Studio-only Supabase storage
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_SECRET_KEY=
+
 # Optional private developer endpoints
 AGENT_API_ENABLED=false
 AGENT_API_KEY=
@@ -116,14 +121,16 @@ AGENT_API_KEY=
 `OWNER_GITHUB_ID` must be the immutable numeric GitHub account ID, not a mutable
 username. `AUTH_SECRET` and `PINTEREST_SESSION_SECRET` must each contain at least 32
 cryptographically random characters.
-Pinterest tokens are encrypted into a Secure, HTTP-only cookie and are not exposed to
-browser JavaScript or stored in the repository.
+Pinterest tokens are encrypted before they enter the private Supabase vault. The
+Secure, HTTP-only browser cookie contains only an opaque random session identifier.
+Neither OAuth tokens nor the Supabase secret key are exposed to browser JavaScript or
+stored in the repository.
 
 ## Deployment
 
 Use two separate Vercel projects:
 
-1. Public project: `APP_MODE=public`, public URL only, no Auth/Pinterest/Agent secrets.
+1. Public project: `APP_MODE=public`, public URL only, no Auth/Pinterest/Supabase/Agent secrets.
 2. Private Studio project: `APP_MODE=studio`,
    `https://mdt07-reference-studio.vercel.app`, owner Auth.js and Pinterest
    variables, plus the exact provider callback URLs.
@@ -157,11 +164,6 @@ configured for npm and GitHub Actions updates.
 
 ## Current limitations
 
-- Rate limiting is process-local and must be replaced with a shared production store
-  before relying on it across serverless instances.
-- The encrypted Pinterest session is browser-cookie based rather than a revocable
-  server-side session record.
-- The optional JSON project store is local-development-only and unsuitable for Vercel.
 - AI visual analysis and Pinterest write operations are not implemented or claimed.
 - Credential rotation is intentionally deferred during the active integration phase;
   rotate all previously handled credentials before expanding access beyond the owner

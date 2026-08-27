@@ -21,13 +21,12 @@ the public deployment.
 This interface is not ready for private production yet:
 
 - the bearer key is static rather than a short-lived, scoped machine credential;
-- rate limiting is process-local;
-- project data uses `data/projects.json`, which is not durable on Vercel;
-- there is no audit log or per-action approval policy.
+- the agent key has no granular per-action scope or approval policy;
+- write idempotency is limited to database uniqueness constraints.
 
-Before production agent access, replace these components with a server-side durable
-store, scoped credentials, distributed rate limits, idempotency, audit events, and an
-explicit allowlist of Pinterest actions. Do not give an agent browser cookies, an app
+Before production agent access, add scoped short-lived credentials, explicit
+per-action approval, and stronger idempotency semantics. Durable Supabase storage,
+distributed rate limits, and audit events are already in place. Do not give an agent browser cookies, an app
 secret, or a Pinterest access token.
 
 ## Current endpoints
@@ -35,10 +34,10 @@ secret, or a Pinterest access token.
 | Route | Purpose |
 | --- | --- |
 | `POST /api/agent/search` | Rank connected-board references for a project brief |
-| `GET /api/agent/projects` | List local research projects |
-| `POST /api/agent/projects` | Create a local research project |
-| `POST /api/agent/references` | Save a reference to a local collection |
-| `DELETE /api/agent/references` | Remove a local reference |
+| `GET /api/agent/projects` | List owner-scoped research projects |
+| `POST /api/agent/projects` | Create an owner-scoped research project |
+| `POST /api/agent/references` | Save a reference to a Supabase collection |
+| `DELETE /api/agent/references` | Remove a saved reference |
 
 Request and response schemas are implemented in the corresponding handlers under
 `src/app/api/agent/`. Treat them as unstable until the durable storage and
