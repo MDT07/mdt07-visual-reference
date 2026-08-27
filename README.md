@@ -122,8 +122,8 @@ SUPABASE_SECRET_KEY=
 
 # Optional Studio-only AI analysis
 AI_CATALOG_ENABLED=false
-OPENAI_API_KEY=
-OPENAI_MODEL=gpt-5.4-mini
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=z-ai/glm-5.2:free
 AI_CATALOG_MAX_REFERENCES=50
 
 # Optional private developer endpoints
@@ -179,7 +179,8 @@ configured for npm and GitHub Actions updates.
 
 - AI visual analysis and Pinterest write operations are not implemented or claimed.
 - AI catalog analysis is limited to previewed app-owned text and workflow metadata;
-  image analysis, autonomous tools, and catalog mutations remain disabled.
+  it is routed server-side through OpenRouter with per-request privacy controls.
+  Image analysis, autonomous tools, and catalog mutations remain disabled.
 - Credential rotation is intentionally deferred during the active integration phase;
   rotate all previously handled credentials before expanding access beyond the owner
   or treating the security milestone as complete.

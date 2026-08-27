@@ -5,7 +5,10 @@ import {
   catalogInputFingerprint,
   CATALOG_ANALYSIS_PROMPT_VERSION,
 } from "@/lib/ai/catalog-payload";
-import { runOpenAiCatalogAnalysis } from "@/lib/ai/openai-catalog";
+import {
+  OpenRouterCatalogError,
+  runOpenRouterCatalogAnalysis,
+} from "@/lib/ai/openrouter-catalog";
 import { requireOwnerApi } from "@/lib/auth/authorization";
 import {
   aiCatalogConfig,
@@ -112,15 +115,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       collectionIds,
       aiCatalogConfig.maxReferences
     );
-    const fingerprint = catalogInputFingerprint(payload);
+    const fingerprintContext = {
+      provider: aiCatalogConfig.provider,
+      model: aiCatalogConfig.model,
+      promptVersion: CATALOG_ANALYSIS_PROMPT_VERSION,
+    };
+    const fingerprint = catalogInputFingerprint(payload, fingerprintContext);
     const preview = {
       payload,
       fingerprint,
       promptVersion: CATALOG_ANALYSIS_PROMPT_VERSION,
       providerConfigured: isAiCatalogConfigured(),
+      provider: aiCatalogConfig.provider,
       model: aiCatalogConfig.model,
       retentionNotice:
-        "Only the payload shown here is sent to OpenAI. The request uses store=false. OpenAI API data is not used for training by default, while abuse-monitoring logs may be retained for up to 30 days unless the API project has approved data-retention controls.",
+        "Only the payload shown here is sent through OpenRouter. Every request requires zero-data-retention routing and denies providers permission to collect request data. OpenRouter may retain operational metadata, but not prompt or response content under this configuration. The request fails closed if no compatible endpoint is available.",
     };
 
     if (action === "preview") {
@@ -156,7 +165,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const generated = await runOpenAiCatalogAnalysis(payload);
+    const generated = await runOpenRouterCatalogAnalysis(payload);
     const analysis = await saveCatalogAnalysis({
       projectId: project.id,
       promptVersion: CATALOG_ANALYSIS_PROMPT_VERSION,
@@ -184,9 +193,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       "AI catalog analysis failed",
       error instanceof Error ? error.message : "Unknown error"
     );
+    const providerError =
+      error instanceof OpenRouterCatalogError ? error : null;
     return NextResponse.json(
-      { error: "AI analysis could not be completed. No catalog data was changed." },
-      { status: 503, headers: noStore }
+      {
+        error:
+          providerError?.message ??
+          "AI analysis could not be completed. No catalog data was changed.",
+      },
+      { status: providerError?.status ?? 503, headers: noStore }
     );
   }
 }

@@ -91,13 +91,14 @@ export default function PrivacyPage() {
           <h3>Optional AI catalog analysis</h3>
           <p>
             If the private-studio owner enables AI analysis and explicitly confirms a
-            preview, the Application may send a limited, displayed payload to OpenAI.
+            preview, the Application may send a limited, displayed payload through
+            OpenRouter to a compatible model provider.
             That payload contains app-owned project fields and owner-authored collection
             descriptions, notes, tags, favorite state, and workflow status. It excludes
             Pinterest images and video, Pin titles and descriptions, Pinterest URLs and
             account identifiers, GitHub profile data, email addresses, OAuth tokens, and
             application secrets. Merely opening the Studio or preparing a preview does
-            not send catalog data to OpenAI.
+            not send catalog data to OpenRouter or a model provider.
           </p>
           <h3>Technical information</h3>
           <p>
@@ -174,13 +175,15 @@ export default function PrivacyPage() {
             retention settings.
           </p>
           <p>
-            AI requests use the OpenAI Responses API with response storage disabled.
+            AI requests use OpenRouter&apos;s server-side API with per-request zero-data-
+            retention routing and provider data collection denied.
             The Application stores the resulting structured report, model name, token
             usage, input fingerprint, and aggregate scope counts in Supabase; it does
-            not duplicate the full preview payload in the AI history table. OpenAI
-            states that API data is not used to train its models by default. Depending
-            on the OpenAI API project&apos;s approved data controls, customer content may
-            still be retained in abuse-monitoring logs for up to 30 days. The owner
+            not duplicate the full preview payload in the AI history table. OpenRouter
+            stores operational request metadata such as model, token counts, and latency.
+            Prompt and response logging is not enabled. The required routing policy
+            permits only compatible provider endpoints that do not retain or collect the
+            request data; the request fails if none is available. The owner
             should not enter sensitive personal information into project briefs, notes,
             tags, or collection descriptions intended for AI analysis.
           </p>
@@ -222,9 +225,10 @@ export default function PrivacyPage() {
             Application. Pinterest processes information under its own terms and privacy
             policy. Supabase provides the private database used for encrypted OAuth
             sessions, saved project metadata, rate-limit counters, and security audit
-            events. If owner-controlled AI analysis is enabled, OpenAI processes only
-            the exact app-owned payload displayed and confirmed in the Studio to
-            generate a structured read-only report. The production website is currently hosted on Vercel, whose systems
+            events. If owner-controlled AI analysis is enabled, OpenRouter and the
+            compatible model provider process only the exact app-owned payload displayed
+            and confirmed in the Studio to generate a structured read-only report. The
+            production website is currently hosted on Vercel, whose systems
             may process technical request data needed to deliver the service. If you
             contact the project by email, your email provider and the recipient’s email
             provider will process that message under their own policies.

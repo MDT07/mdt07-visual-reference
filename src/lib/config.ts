@@ -39,8 +39,9 @@ export const agentApiConfig = {
 export const aiCatalogConfig = {
   enabled:
     deploymentConfig.isStudio && process.env.AI_CATALOG_ENABLED === "true",
-  apiKey: process.env.OPENAI_API_KEY?.trim() ?? "",
-  model: process.env.OPENAI_MODEL?.trim() || "gpt-5.4-mini",
+  provider: "OpenRouter",
+  apiKey: process.env.OPENROUTER_API_KEY?.trim() ?? "",
+  model: process.env.OPENROUTER_MODEL?.trim() || "z-ai/glm-5.2:free",
   maxReferences: Math.max(
     1,
     Math.min(100, Number(process.env.AI_CATALOG_MAX_REFERENCES ?? 50) || 50)

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildCatalogAnalysisInput,
   catalogInputFingerprint,
+  CATALOG_ANALYSIS_PROMPT_VERSION,
 } from "@/lib/ai/catalog-payload";
 import type { ResearchProject } from "@/lib/store/projects";
 
@@ -48,6 +49,12 @@ const project: ResearchProject = {
 };
 
 describe("AI catalog payload boundary", () => {
+  const fingerprintContext = {
+    provider: "OpenRouter",
+    model: "z-ai/glm-5.2:free",
+    promptVersion: CATALOG_ANALYSIS_PROMPT_VERSION,
+  };
+
   it("includes owner-authored research fields and excludes Pinterest content", () => {
     const payload = buildCatalogAnalysisInput(project, [], 50);
     const serialized = JSON.stringify(payload);
@@ -70,9 +77,37 @@ describe("AI catalog payload boundary", () => {
       50
     );
 
-    expect(catalogInputFingerprint(first)).toHaveLength(64);
-    expect(catalogInputFingerprint(first)).toBe(catalogInputFingerprint(first));
-    expect(catalogInputFingerprint(first)).not.toBe(catalogInputFingerprint(second));
+    expect(catalogInputFingerprint(first, fingerprintContext)).toHaveLength(64);
+    expect(catalogInputFingerprint(first, fingerprintContext)).toBe(
+      catalogInputFingerprint(first, fingerprintContext)
+    );
+    expect(catalogInputFingerprint(first, fingerprintContext)).not.toBe(
+      catalogInputFingerprint(second, fingerprintContext)
+    );
+  });
+
+  it("binds consent to the provider, model, and prompt version", () => {
+    const payload = buildCatalogAnalysisInput(project, [], 50);
+    const reviewed = catalogInputFingerprint(payload, fingerprintContext);
+
+    expect(reviewed).not.toBe(
+      catalogInputFingerprint(payload, {
+        ...fingerprintContext,
+        model: "another/free-model",
+      })
+    );
+    expect(reviewed).not.toBe(
+      catalogInputFingerprint(payload, {
+        ...fingerprintContext,
+        provider: "another-provider",
+      })
+    );
+    expect(reviewed).not.toBe(
+      catalogInputFingerprint(payload, {
+        ...fingerprintContext,
+        promptVersion: "catalog-direction-v3",
+      })
+    );
   });
 
   it("limits the number of reference annotations sent", () => {

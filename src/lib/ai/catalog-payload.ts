@@ -3,7 +3,13 @@ import { createHash } from "node:crypto";
 import type { CatalogAnalysisInput } from "@/lib/ai/catalog-types";
 import type { ResearchProject } from "@/lib/store/projects";
 
-export const CATALOG_ANALYSIS_PROMPT_VERSION = "catalog-direction-v1";
+export const CATALOG_ANALYSIS_PROMPT_VERSION = "catalog-direction-v2";
+
+export interface CatalogFingerprintContext {
+  provider: string;
+  model: string;
+  promptVersion: string;
+}
 
 export function buildCatalogAnalysisInput(
   project: ResearchProject,
@@ -76,6 +82,11 @@ export function buildCatalogAnalysisInput(
   };
 }
 
-export function catalogInputFingerprint(input: CatalogAnalysisInput): string {
-  return createHash("sha256").update(JSON.stringify(input)).digest("hex");
+export function catalogInputFingerprint(
+  input: CatalogAnalysisInput,
+  context: CatalogFingerprintContext
+): string {
+  return createHash("sha256")
+    .update(JSON.stringify({ input, context }))
+    .digest("hex");
 }

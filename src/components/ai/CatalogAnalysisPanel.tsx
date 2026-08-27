@@ -268,11 +268,12 @@ export default function CatalogAnalysisPanel({ project }: CatalogAnalysisPanelPr
               <p className="text-sm text-text-tertiary">Prepare the payload to see every field that would leave the private Studio.</p>
             ) : (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
                   {[
                     ["Collections", preview.payload.totals.collections],
                     ["References", preview.payload.totals.referencesIncluded],
                     ["Annotated", preview.payload.totals.annotated],
+                    ["Provider", preview.provider],
                     ["Model", preview.model],
                   ].map(([label, value]) => (
                     <div key={label} className="rounded-lg border border-surface-3 bg-surface-0 p-3">
@@ -290,7 +291,7 @@ export default function CatalogAnalysisPanel({ project }: CatalogAnalysisPanelPr
                 <p className="text-xs leading-5 text-text-tertiary">{preview.retentionNotice}</p>
                 {!preview.providerConfigured && (
                   <p className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
-                    Preview is ready, but model execution is disabled until AI_CATALOG_ENABLED and OPENAI_API_KEY are configured on the private Studio only.
+                    Preview is ready, but model execution is disabled until AI_CATALOG_ENABLED and OPENROUTER_API_KEY are configured on the private Studio only.
                   </p>
                 )}
                 <label className="flex items-start gap-3 text-sm leading-6 text-text-secondary">

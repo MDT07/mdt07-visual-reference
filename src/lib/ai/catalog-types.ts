@@ -75,6 +75,7 @@ export interface CatalogAnalysisPreview {
   fingerprint: string;
   promptVersion: string;
   providerConfigured: boolean;
+  provider: string;
   model: string;
   retentionNotice: string;
 }
