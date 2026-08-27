@@ -470,7 +470,7 @@ export default function ReferencesSearchShell({
             Moodboard
           </h2>
           <p className="max-w-3xl text-sm leading-6 text-text-secondary">
-            References saved to {selectedProject?.name ?? "your project"} / {collectionName || "collection"}
+            References saved to {selectedProject?.name ?? "your project"} / {collectionName || "collection"}{" "}
             remain available across sessions. Each item keeps attribution and a link to the original Pin.
           </p>
         </div>
