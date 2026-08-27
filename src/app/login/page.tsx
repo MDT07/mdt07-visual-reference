@@ -31,7 +31,7 @@ export default async function LoginPage() {
           MDT07 Admin
         </h1>
         <p className="mt-4 leading-7 text-text-secondary">
-          This workspace is restricted to the configured MDT07 GitHub owner.
+          This administration area is restricted to the configured MDT07 GitHub owner.
           Pinterest OAuth and connected API routes are unavailable without this
           application session.
         </p>

@@ -4,8 +4,8 @@ Status: Accepted
 
 - Request only `boards:read` and `pins:read`.
 - Fetch public Boards and Pins only for the authenticated owner.
-- Persist only references the owner explicitly saves.
-- Publish only sanitized active catalog records with Pinterest attribution and links.
+- Read only public Boards and their Pins through the connected owner account.
+- Return only sanitized, no-store Pinterest metadata with attribution and links.
 - Do not copy Pinterest media binaries into application storage.
 - Do not scrape, train models on Pinterest material, call external AI providers, or
   perform Pinterest write actions.

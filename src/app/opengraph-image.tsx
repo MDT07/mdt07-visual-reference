@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const alt =
-  "MDT07 Visual Reference — project-scoped research for web design and development";
+  "MDT07 Visual Reference — public Pinterest Boards for web design research";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -69,7 +69,7 @@ export default function OpenGraphImage() {
               maxWidth: 980,
             }}
           >
-            Focus visual research around one web design or development project.
+            Explore public Pinterest Boards as clear, source-linked visual references.
           </div>
         </div>
       </div>

@@ -29,8 +29,8 @@ export default function TermsPage() {
           <h2>1. Purpose</h2>
           <p>
             MDT07 Visual Reference (the “Application”) is an independent visual research
-            catalog for web design and development. It organizes owner-selected,
-            source-linked Pinterest references into project Boards to support study and
+            catalog for web design and development. It presents public Pinterest Boards
+            and source-linked Pins from the connected owner account to support study and
             original work. It is not an official Pinterest product, a replacement
             Pinterest client, or endorsed by or affiliated with Pinterest.
           </p>
@@ -64,7 +64,7 @@ export default function TermsPage() {
           <h2>4. Access controls</h2>
           <p>
             Public Boards and Pins are read-only and require no registration. Pinterest
-            OAuth, synchronization, project changes, and catalog management are restricted
+            OAuth and connection controls are restricted
             to a private administration area and its configured owner. Public source code
             does not grant access to the hosted administration area, its Pinterest account,
             sessions, credentials, or data-management endpoints.

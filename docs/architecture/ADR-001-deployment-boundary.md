@@ -8,8 +8,8 @@ Run the same Next.js repository as two Vercel deployments:
 
 - `APP_MODE=public` serves the website, legal pages, public Boards, and sanitized
   Pin metadata. It does not enable Auth.js or Pinterest routes.
-- `APP_MODE=admin` serves owner authentication, Pinterest OAuth/API, catalog
-  mutations, export, maintenance, and audit controls.
+- `APP_MODE=admin` serves owner authentication, Pinterest OAuth/API, connection
+  maintenance, and audit controls.
 
 Unknown mode values resolve to `public`. Owner-only pages and APIs fail closed outside
 admin mode. The public server reads only the sanitized `/api/public/boards` endpoint

@@ -8,9 +8,8 @@ requires the authenticated GitHub owner and uses server-side credentials.
 - `boards:read`
 - `pins:read`
 
-The application lists public Boards available to the connected account, retrieves Pins
-from the selected Board, ranks returned metadata against an owner-entered project brief,
-and saves only references the owner explicitly chooses. It does not use global Pinterest
+The application lists real public Boards available to the connected owner account and
+retrieves all available Pins when a visitor opens a Board. It does not use global Pinterest
 search, secret content, write actions, scraping, media copying, or an AI provider.
 
 ## Flow
@@ -21,9 +20,9 @@ Owner GitHub session
   -> Pinterest authorization
   -> /api/pinterest/auth/callback
   -> encrypted server-side Supabase connection
-  -> owner-protected Pinterest API routes
-  -> selected references in project collections
-  -> sanitized active collections on the public /boards catalog
+  -> server-only owner Pinterest connection
+  -> sanitized no-store /api/public/boards endpoints
+  -> public /boards catalog and individual Board pages
 ```
 
 The browser receives only an opaque HTTP-only connection identifier. Access and refresh

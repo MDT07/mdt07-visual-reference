@@ -70,18 +70,12 @@ export default function PrivacyPage() {
             descriptions, alt text, remote images, media details, links, timestamps, and
             an attribution username included by Pinterest.
           </p>
-          <h3>Projects and references</h3>
+          <h3>Public Board catalog</h3>
           <p>
-            When the owner saves a reference, the Application stores its project and
-            collection, relevant Pin metadata, original source URL, and owner-authored
-            notes, tags, favorite state, and workflow status in Supabase. Pinterest image
-            and video files are not copied into Application storage.
-          </p>
-          <p>
-            Collections in active projects may be published in the open catalog with
-            their name, description, project context, Pin title and description, remote
-            image URL, attribution username, and original Pinterest URL. Owner notes,
-            GitHub identifiers, OAuth data, audit events, and archived references are not public.
+            The public catalog requests the connected account&apos;s public Boards and the
+            Pins of a Board that a visitor opens. It exposes only sanitized Pinterest
+            metadata and original-source links. The Application does not store private
+            curation notes, favorites, or copied Pinterest image and video files.
           </p>
         </section>
 
@@ -104,9 +98,8 @@ export default function PrivacyPage() {
           <ul>
             <li>Deliver and secure the public website and reference catalog.</li>
             <li>Authenticate the configured owner and authorized Pinterest API requests.</li>
-            <li>Retrieve public Boards and Pins selected by the owner for visual research.</li>
-            <li>Save, organize, publish, update, export, and delete app-owned catalog records.</li>
-            <li>Link every published reference back to its original Pinterest source.</li>
+            <li>Retrieve the connected owner account&apos;s public Boards and their Pins.</li>
+            <li>Present a read-only visual catalog with links to original Pinterest sources.</li>
             <li>Enforce request limits, audit security-relevant actions, and diagnose errors.</li>
             <li>Respond to support, privacy, or deletion messages sent by email.</li>
           </ul>
@@ -131,8 +124,7 @@ export default function PrivacyPage() {
             identifiers and counters are retained only as needed for rate limiting.
           </p>
           <p>
-            Saved projects remain until the owner edits or deletes them. The public site
-            reads a sanitized server-side endpoint hosted by the private backend; database
+            The public site reads a sanitized server-side endpoint hosted by the private backend; database
             credentials never enter the public deployment or browser code. Pinterest API responses use no-store
             instructions. Remote Pin media is loaded from its original source without
             being copied to Application storage.
@@ -181,8 +173,9 @@ export default function PrivacyPage() {
           <p>
             For a privacy or deletion request, email
             <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>.
-            The owner can delete saved projects and references and export app-owned
-            catalog data. Routine provider logs may remain until the provider&apos;s normal retention cycle completes.
+            Disconnecting removes the encrypted Pinterest connection record and stops
+            further Board retrieval. Routine provider logs may remain until the
+            provider&apos;s normal retention cycle completes.
           </p>
         </section>
 

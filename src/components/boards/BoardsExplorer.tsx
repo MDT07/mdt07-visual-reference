@@ -12,7 +12,7 @@ export default function BoardsExplorer({ boards }: { boards: PublicBoard[] }) {
     () =>
       normalizedQuery
         ? boards.filter((board) =>
-            [board.name, board.description, board.projectName, board.projectBrief]
+            [board.name, board.description, board.ownerUsername]
               .join(" ")
               .toLowerCase()
               .includes(normalizedQuery)
@@ -25,17 +25,17 @@ export default function BoardsExplorer({ boards }: { boards: PublicBoard[] }) {
     <div>
       <div className="mb-8 flex flex-col gap-4 border-y border-surface-2 py-5 sm:flex-row sm:items-center sm:justify-between">
         <label className="relative block w-full sm:max-w-md">
-          <span className="sr-only">Filter collections</span>
+          <span className="sr-only">Filter Boards</span>
           <input
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search collections or projects"
+            placeholder="Search Boards or Pinterest owners"
             className="w-full rounded-full border border-surface-3 bg-surface-0 px-5 py-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-brand focus:outline-none"
           />
         </label>
         <p className="text-sm text-text-tertiary" aria-live="polite">
-          {filteredBoards.length} of {boards.length} collections
+          {filteredBoards.length} of {boards.length} Boards
         </p>
       </div>
 
@@ -47,7 +47,7 @@ export default function BoardsExplorer({ boards }: { boards: PublicBoard[] }) {
         </div>
       ) : (
         <div className="rounded-3xl border border-dashed border-surface-3 px-6 py-16 text-center">
-          <h2 className="text-xl font-semibold text-text-primary">No matching collections</h2>
+          <h2 className="text-xl font-semibold text-text-primary">No matching Boards</h2>
           <p className="mt-2 text-sm text-text-secondary">Try a shorter or broader search.</p>
         </div>
       )}

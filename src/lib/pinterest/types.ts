@@ -28,6 +28,11 @@ export interface PinterestBoardOwner {
   username?: string;
 }
 
+export interface PinterestBoardMedia {
+  image_cover_url?: string;
+  pin_thumbnail_urls?: string[];
+}
+
 export interface PinterestBoard {
   id: string;
   name: string;
@@ -35,6 +40,9 @@ export interface PinterestBoard {
   privacy?: "PUBLIC" | "PROTECTED" | "SECRET";
   pin_count?: number;
   owner?: PinterestBoardOwner;
+  media?: PinterestBoardMedia;
+  board_pins_modified_at?: string;
+  created_at?: string;
 }
 
 export interface PinterestPin {
@@ -81,67 +89,4 @@ export interface PinterestErrorResponse {
   code?: number;
   message?: string;
   detail?: string;
-}
-
-export interface CuratedPin {
-  id: string;
-  pinterestId: string;
-  title?: string;
-  description?: string;
-  altText?: string;
-  link?: string;
-  sourceUrl: string;
-  imageUrl: string;
-  imageWidth?: number;
-  imageHeight?: number;
-  dominantColor?: string;
-  authorUsername?: string;
-  mediaType: "image" | "video";
-  query: string;
-  savedAt: string;
-}
-
-export interface VisualReference {
-  id: string;
-  source: "pinterest";
-  sourceId: string;
-  sourceUrl: string;
-
-  title?: string;
-  description?: string;
-  altText?: string;
-
-  imageUrl?: string;
-  thumbnailUrl?: string;
-  imageWidth?: number;
-  imageHeight?: number;
-  aspectRatio?: number;
-  dominantColor?: string;
-
-  link?: string;
-  authorUsername?: string;
-  boardId?: string;
-  boardName?: string;
-
-  creativeType?: string;
-  tags?: string[];
-
-  designAttributes?: {
-    layout?: string[];
-    typography?: string[];
-    colorPalette?: string[];
-    imagery?: string[];
-    navigation?: string[];
-    effects?: string[];
-    composition?: string[];
-    spacing?: string[];
-    motion?: string[];
-  };
-
-  relevanceScore?: number;
-  qualityScore?: number;
-  finalScore?: number;
-
-  rawQuery?: string;
-  fetchedAt: string;
 }

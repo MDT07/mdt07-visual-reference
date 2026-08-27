@@ -10,17 +10,17 @@ interface BoardPageProps {
   params: Promise<{ id: string }>;
 }
 
-const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const boardIdPattern = /^\d+$/;
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: BoardPageProps): Promise<Metadata> {
   const { id } = await params;
-  if (!uuidPattern.test(id)) return {};
+  if (!boardIdPattern.test(id)) return {};
   const board = await getPublicBoard(id);
   if (!board) return {};
   const description =
-    board.description || board.projectBrief || `Explore ${board.pinCount} curated visual references.`;
+    board.description || `Explore ${board.pinCount} visual references from this public Pinterest Board.`;
 
   return {
     title: board.name,
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: BoardPageProps): Promise<Meta
 
 export default async function BoardPage({ params }: BoardPageProps) {
   const { id } = await params;
-  if (!uuidPattern.test(id)) notFound();
+  if (!boardIdPattern.test(id)) notFound();
   const board = await getPublicBoard(id);
   if (!board) notFound();
 
@@ -52,14 +52,14 @@ export default async function BoardPage({ params }: BoardPageProps) {
             <span aria-hidden="true">←</span> All boards
           </Link>
           <p className="mt-10 text-xs font-semibold uppercase tracking-[0.2em] text-brand">
-            {board.projectName}
+            {board.ownerUsername ? `@${board.ownerUsername}` : "Public Pinterest Board"}
           </p>
           <h1 className="mt-3 max-w-5xl text-4xl font-semibold leading-[1.05] tracking-[-0.05em] text-text-primary sm:text-6xl">
             {board.name}
           </h1>
           <div className="mt-6 grid gap-6 border-t border-surface-2 pt-6 md:grid-cols-[1fr_auto] md:items-start">
             <p className="max-w-3xl text-lg leading-8 text-text-secondary">
-              {board.description || board.projectBrief || "A curated visual reference collection."}
+              {board.description || "A public Pinterest Board connected to MDT07 Visual Reference."}
             </p>
             <p className="text-sm text-text-tertiary">
               {board.pinCount} {board.pinCount === 1 ? "reference" : "references"}

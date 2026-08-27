@@ -1,4 +1,4 @@
--- MDT07 Visual Reference private workspace.
+-- Historical MDT07 catalog tables. The current runtime no longer uses these records.
 -- Existing tables in this Supabase project are intentionally left untouched.
 
 create extension if not exists pgcrypto with schema extensions;

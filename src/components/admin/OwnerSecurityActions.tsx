@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function OwnerDataActions() {
+export default function OwnerSecurityActions() {
   const [running, setRunning] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -29,17 +29,11 @@ export default function OwnerDataActions() {
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-      <a
-        href="/api/export"
-        className="inline-flex w-fit rounded-md bg-text-primary px-4 py-2 text-sm font-medium text-surface-0"
-      >
-        Export catalog JSON
-      </a>
       <button
         type="button"
         onClick={() => void runCleanup()}
         disabled={running}
-        className="inline-flex w-fit rounded-md border border-surface-3 px-4 py-2 text-sm font-medium text-text-primary disabled:opacity-50"
+        className="inline-flex w-fit rounded-full border border-surface-3 px-5 py-2.5 text-sm font-semibold text-text-primary transition hover:border-brand hover:text-brand disabled:opacity-50"
       >
         {running ? "Cleaning…" : "Clean expired security state"}
       </button>

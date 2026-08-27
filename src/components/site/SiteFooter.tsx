@@ -16,8 +16,8 @@ export default function SiteFooter() {
         <div className="max-w-2xl space-y-3">
           <p className="font-semibold text-text-primary">MDT07 Visual Reference</p>
           <p className="text-sm leading-6 text-text-secondary">
-            Project-scoped visual research for web design and development, with
-            owner-selected references linked to their original Pinterest sources.
+            Public Pinterest Boards and source-linked Pins organized as a clear visual
+            reference library for web design and development.
           </p>
           <p className="text-xs leading-5 text-text-tertiary">
             MDT07 Visual Reference is an independent project and is not endorsed

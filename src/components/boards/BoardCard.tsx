@@ -4,18 +4,16 @@ import Link from "next/link";
 import type { PublicBoard } from "@/lib/store/public-catalog";
 
 function BoardCover({ board }: { board: PublicBoard }) {
-  const images = board.pins
-    .map((pin) => ({
-      src: pin.imageUrl ?? pin.thumbnailUrl,
-      alt: pin.altText ?? pin.title ?? "Visual reference",
-    }))
-    .filter((image): image is { src: string; alt: string } => Boolean(image.src))
-    .slice(0, 4);
+  const images = [board.coverImageUrl, ...board.thumbnailUrls]
+    .filter((src): src is string => Boolean(src))
+    .filter((src, index, all) => all.indexOf(src) === index)
+    .slice(0, 4)
+    .map((src) => ({ src, alt: `${board.name} Pinterest Board preview` }));
 
   if (images.length === 0) {
     return (
       <div className="grid h-full place-items-center bg-surface-1 px-8 text-center text-sm text-text-tertiary">
-        This collection is ready for its first reference.
+            This Pinterest Board has no available cover preview.
       </div>
     );
   }
@@ -25,7 +23,7 @@ function BoardCover({ board }: { board: PublicBoard }) {
       {images.map((image, index) => (
         <div
           key={`${image.src}-${index}`}
-          className={images.length === 1 ? "col-span-2 row-span-2" : "relative overflow-hidden"}
+          className={images.length === 1 ? "relative col-span-2 row-span-2 overflow-hidden" : "relative overflow-hidden"}
         >
           <Image
             src={image.src}
@@ -53,7 +51,7 @@ export default function BoardCard({ board }: { board: PublicBoard }) {
         <div className="p-5 sm:p-6">
           <div className="flex items-center justify-between gap-4">
             <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-brand">
-              {board.projectName}
+              {board.ownerUsername ? `@${board.ownerUsername}` : "Pinterest Board"}
             </p>
             <span className="shrink-0 text-xs text-text-tertiary">
               {board.pinCount} {board.pinCount === 1 ? "Pin" : "Pins"}
@@ -63,7 +61,7 @@ export default function BoardCard({ board }: { board: PublicBoard }) {
             {board.name}
           </h2>
           <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-text-secondary">
-            {board.description || board.projectBrief || "A curated visual reference collection."}
+            {board.description || "Open this Board to explore all available Pins."}
           </p>
           <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-text-primary transition group-hover:text-brand">
             Open collection <span aria-hidden="true">↗</span>

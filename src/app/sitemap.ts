@@ -3,6 +3,8 @@ import { siteConfig } from "@/lib/config";
 import { deploymentConfig } from "@/lib/deployment";
 import { listPublicBoards } from "@/lib/store/public-catalog";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (deploymentConfig.isAdmin) return [];
 

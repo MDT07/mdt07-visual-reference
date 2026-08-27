@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireOwnerApi } from "@/lib/auth/authorization";
 import { enforceMutationRateLimit } from "@/lib/security/mutation-rate-limit";
 import { hasValidMutationOrigin } from "@/lib/security/request";
-import { cleanupExpiredSecurityState } from "@/lib/store/projects";
+import { cleanupExpiredSecurityState } from "@/lib/store/security-state";
 
 export const dynamic = "force-dynamic";
 

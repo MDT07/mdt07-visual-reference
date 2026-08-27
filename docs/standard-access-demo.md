@@ -30,9 +30,9 @@ requesting only `boards:read` and `pins:read`.
 
 | Time | On screen | Optional English voiceover |
 | --- | --- | --- |
-| 0:00–0:08 | Production URL, disconnected workspace, and **Connect with Pinterest OAuth** | “MDT07 Visual Reference uses Pinterest OAuth and the Pinterest API to research public visual references for one web project.” |
+| 0:00–0:08 | Production URL, disconnected admin screen, and **Connect with Pinterest OAuth** | “MDT07 Visual Reference uses Pinterest OAuth and the Pinterest API to research public visual references for one web project.” |
 | 0:08–0:22 | Click **Connect with Pinterest OAuth**; keep the Pinterest authorization URL, app name, and requested permissions visible | “The user authorizes only read access to public boards and public Pins.” |
-| 0:22–0:32 | Click **Give access** and show the uninterrupted return to the production callback and connected workspace | “Pinterest returns an authorization code. The server exchanges it for a token and keeps credentials outside the browser UI.” |
+| 0:22–0:32 | Click **Give access** and show the uninterrupted return to the production callback and connected admin screen | “Pinterest returns an authorization code. The server exchanges it for a token and keeps credentials outside the browser UI.” |
 | 0:32–0:44 | Show the **Live Pinterest API response** board count and choose `Web Design References` | “The app now retrieves the connected account’s public boards from the Pinterest API. Secret content is not requested.” |
 | 0:44–0:58 | Enter `editorial architecture portfolio, monochrome, asymmetric layout` and click **Search** | “The server retrieves public Pins from the selected board and ranks their metadata locally against the project brief.” |
 | 0:58–1:10 | Show the live Pin count, results, Pinterest attribution, and expand **Search pipeline** | “The displayed Pins came from this live Pinterest API request and are not cached.” |

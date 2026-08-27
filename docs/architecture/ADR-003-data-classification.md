@@ -5,13 +5,12 @@ Status: Accepted
 ## Public
 
 - application and legal copy;
-- active project and collection names/descriptions;
-- non-archived Pin title, description, remote image URL, attribution username, and
+- public Pinterest Board names, descriptions, cover media and Pin counts;
+- public Pin title, description, remote image URL, attribution username, and
   original Pinterest URL.
 
 ## Private app data
 
-- project briefs, notes, tags, favorite and workflow state;
 - numeric GitHub owner identifier;
 - audit and rate-limit records.
 

@@ -78,56 +78,6 @@ async function pinterestFetch<T>(
   return res.json();
 }
 
-export async function listPins(
-  session: PinterestSession,
-  options: { pageSize?: number; bookmark?: string } = {}
-): Promise<{
-  data: PinterestSearchResponse;
-  session: PinterestSession;
-  refreshed: boolean;
-}> {
-  const active = await ensurePinterestSession(session);
-  const params = new URLSearchParams({
-    page_size: String(options.pageSize ?? pinterestConfig.searchPageSize),
-  });
-  if (options.bookmark) {
-    params.set("bookmark", options.bookmark);
-  }
-
-  const data = await pinterestFetch<PinterestSearchResponse>(
-    active.session,
-    `/pins?${params.toString()}`
-  );
-  return { data, session: active.session, refreshed: active.refreshed };
-}
-
-export async function listPinsAllPages(
-  session: PinterestSession,
-  options: { pageSize?: number; maxPages?: number } = {}
-): Promise<{
-  pins: PinterestPin[];
-  session: PinterestSession;
-  refreshed: boolean;
-}> {
-  const pageSize = options.pageSize ?? pinterestConfig.searchPageSize;
-  const maxPages = options.maxPages ?? 2;
-  const pins: PinterestPin[] = [];
-  let bookmark: string | undefined;
-  let activeSession = session;
-  let refreshed = false;
-
-  for (let page = 0; page < maxPages; page++) {
-    const result = await listPins(activeSession, { pageSize, bookmark });
-    pins.push(...result.data.items);
-    activeSession = result.session;
-    refreshed = refreshed || result.refreshed;
-    bookmark = result.data.bookmark ?? undefined;
-    if (!bookmark) break;
-  }
-
-  return { pins, session: activeSession, refreshed };
-}
-
 export async function listPublicBoards(
   session: PinterestSession,
   options: { pageSize?: number; bookmark?: string } = {}
@@ -175,6 +125,22 @@ export async function listPublicBoardsAllPages(
   }
 
   return { boards, session: activeSession, refreshed };
+}
+
+export async function getBoard(
+  session: PinterestSession,
+  boardId: string
+): Promise<{
+  board: PinterestBoard;
+  session: PinterestSession;
+  refreshed: boolean;
+}> {
+  const active = await ensurePinterestSession(session);
+  const board = await pinterestFetch<PinterestBoard>(
+    active.session,
+    `/boards/${encodeURIComponent(boardId)}`
+  );
+  return { board, session: active.session, refreshed: active.refreshed };
 }
 
 export async function listPinsOnBoard(
@@ -228,12 +194,4 @@ export async function listPinsOnBoardAllPages(
   }
 
   return { pins, session: activeSession, refreshed };
-}
-
-export async function getPin(
-  session: PinterestSession,
-  pinId: string
-): Promise<PinterestPin> {
-  const active = await ensurePinterestSession(session);
-  return pinterestFetch(active.session, `/pins/${pinId}`);
 }

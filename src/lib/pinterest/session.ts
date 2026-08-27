@@ -22,6 +22,11 @@ export interface PinterestSession {
   scope?: string;
 }
 
+export interface OwnerPinterestConnection {
+  connectionHash: string;
+  session: PinterestSession;
+}
+
 const SESSION_COOKIE_PRODUCTION = "__Host-mdt07-vref-pinterest-session";
 const SESSION_COOKIE_DEVELOPMENT = "mdt07-vref-pinterest-session";
 const SESSION_MAX_AGE_SECONDS = 60 * 24 * 60 * 60;
@@ -157,6 +162,57 @@ export async function getPinterestSessionFromRequest(
 export async function getPinterestSessionFromCookies(): Promise<PinterestSession | null> {
   const cookieStore = await cookies();
   return loadPinterestSession(cookieStore.get(pinterestSessionCookieName)?.value);
+}
+
+export async function getLatestOwnerPinterestConnection(): Promise<OwnerPinterestConnection | null> {
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("mdt07_pinterest_connections")
+    .select("session_id_hash,encrypted_payload,refresh_expires_at")
+    .eq("owner_github_id", ownerGithubId())
+    .order("last_used_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+
+  if (data.refresh_expires_at && new Date(data.refresh_expires_at).getTime() <= Date.now()) {
+    await supabase
+      .from("mdt07_pinterest_connections")
+      .delete()
+      .eq("session_id_hash", data.session_id_hash)
+      .eq("owner_github_id", ownerGithubId());
+    return null;
+  }
+
+  const session = decryptPinterestSession(data.encrypted_payload);
+  if (!session) return null;
+  return { connectionHash: data.session_id_hash, session };
+}
+
+export async function updateOwnerPinterestConnection(
+  connectionHash: string,
+  session: PinterestSession
+): Promise<void> {
+  if (!/^[a-f0-9]{64}$/.test(connectionHash)) {
+    throw new Error("Invalid Pinterest connection identifier.");
+  }
+
+  const now = new Date().toISOString();
+  const { error } = await getSupabaseAdmin()
+    .from("mdt07_pinterest_connections")
+    .update({
+      encrypted_payload: encryptPinterestSession(session),
+      access_expires_at: new Date(session.expiresAt).toISOString(),
+      refresh_expires_at: session.refreshExpiresAt
+        ? new Date(session.refreshExpiresAt).toISOString()
+        : null,
+      updated_at: now,
+      last_used_at: now,
+    })
+    .eq("session_id_hash", connectionHash)
+    .eq("owner_github_id", ownerGithubId());
+  if (error) throw error;
 }
 
 export async function setPinterestSession(

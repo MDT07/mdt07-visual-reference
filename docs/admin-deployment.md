@@ -14,5 +14,5 @@ After changing the private host, update both provider registrations:
 - Pinterest: `<PRIVATE_ADMIN_ORIGIN>/api/pinterest/auth/callback`
 
 Then verify unauthenticated `/admin` redirects to `/login`, non-owner GitHub sign-in is
-rejected, owner OAuth completes, Boards load, a reference can be saved, and the public
-catalog shows the sanitized result after revalidation.
+rejected, owner OAuth completes, all public Boards load, and each public Board page
+returns its Pins without exposing credentials.

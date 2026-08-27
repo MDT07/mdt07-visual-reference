@@ -5,7 +5,7 @@ import { getPublicUrl } from "@/lib/config";
 import { listPublicBoards } from "@/lib/store/public-catalog";
 
 const description =
-  "Browse curated visual reference collections for web design, development, art direction, and interface projects.";
+  "Browse public Pinterest Boards and explore their Pins as visual references for web design, development, and art direction.";
 
 export const metadata: Metadata = {
   title: "Boards",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export default async function BoardsPage() {
   const boards = await listPublicBoards();
@@ -34,16 +34,16 @@ export default async function BoardsPage() {
           <div className="mt-4 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
               <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.05em] text-text-primary sm:text-6xl">
-                Boards built around real design questions.
+              Your Pinterest Boards, clearly organized.
               </h1>
               <p className="mt-5 max-w-3xl text-lg leading-8 text-text-secondary">
-                Open a collection to explore every saved Pin, understand its project
-                context, and follow any reference back to the original source on Pinterest.
+                Open any public Board to explore all of its available Pins and follow
+                every reference back to its original source on Pinterest.
               </p>
             </div>
             <dl className="flex gap-8 text-sm">
               <div>
-                <dt className="text-text-tertiary">Collections</dt>
+                <dt className="text-text-tertiary">Boards</dt>
                 <dd className="mt-1 text-2xl font-semibold text-text-primary">{boards.length}</dd>
               </div>
               <div>
@@ -64,11 +64,11 @@ export default async function BoardsPage() {
               Catalog in progress
             </p>
             <h2 className="mt-3 text-2xl font-semibold text-text-primary">
-              Public collections will appear here
+              Public Boards are temporarily unavailable
             </h2>
             <p className="mx-auto mt-3 max-w-xl leading-7 text-text-secondary">
-              The owner is preparing the first curated Boards. No Pinterest connection
-              or account is required to view them once published.
+              The connected Pinterest account currently has no available public Boards,
+              or its owner connection needs to be renewed in the private admin area.
             </p>
           </div>
         )}

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { requireOwnerApi } from "@/lib/auth/authorization";
-import { listAuditEvents } from "@/lib/store/projects";
+import { listAuditEvents } from "@/lib/store/security-state";
 
 export const dynamic = "force-dynamic";
 

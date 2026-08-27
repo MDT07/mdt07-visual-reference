@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const boards = await listPublicBoards();
@@ -40,8 +40,8 @@ export default async function HomePage() {
                 Better references.<br />Stronger web ideas.
               </h1>
               <p className="mt-7 max-w-3xl text-lg leading-8 text-text-secondary sm:text-xl">
-                MDT07 Visual Reference organizes carefully selected Pinterest references
-                into clear project Boards for web design, development, and art direction.
+                MDT07 Visual Reference presents the connected account&apos;s public Pinterest
+                Boards as a clear visual library for web design, development, and art direction.
               </p>
               <div className="mt-9 flex flex-wrap gap-3">
                 <Link
@@ -83,7 +83,7 @@ export default async function HomePage() {
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">
-              Latest collections
+              Public Pinterest Boards
             </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-text-primary sm:text-5xl">
               Explore the catalog
@@ -104,8 +104,8 @@ export default async function HomePage() {
           <div className="mt-10 rounded-[2rem] border border-dashed border-surface-3 bg-surface-0 px-6 py-16 text-center">
             <h3 className="text-xl font-semibold text-text-primary">The first collection is being curated</h3>
             <p className="mx-auto mt-3 max-w-xl leading-7 text-text-secondary">
-              The catalog structure is live. Active project collections will appear here
-              as soon as references are published from the private admin area.
+              The catalog structure is live. Public Pinterest Boards will appear here
+              while the private owner connection is active.
             </p>
           </div>
         )}
@@ -135,8 +135,8 @@ export default async function HomePage() {
               Open catalog. Private management.
             </h2>
             <p className="mt-4 max-w-3xl leading-7 text-text-secondary">
-              Anyone can browse published Boards and Pins. Pinterest OAuth, catalog edits,
-              tokens, and synchronization remain isolated behind owner-only GitHub authentication.
+              Anyone can browse public Boards and Pins. Pinterest OAuth, tokens, and
+              connection controls remain isolated behind owner-only GitHub authentication.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
